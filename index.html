@@ -1,0 +1,5542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Content Launchpad — Riverside</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E0E0C;
+    --sidebar-bg: #0A0A09;
+    --surface-1: #1A1916;
+    --surface-2: #21201C;
+    --line: #2A2823;
+    --line-soft: #1F1E1A;
+
+    --ink: #F5F2EC;
+    --ink-2: #C8C3B8;
+    --ink-3: #8B8678;
+    --ink-4: #5C584F;
+
+    --accent: #E8A766;
+    --accent-dim: #B07A3F;
+    --accent-glow: rgba(232, 167, 102, 0.08);
+
+    --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+    --sidebar-w: 80px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(232, 167, 102, 0.04), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 80% 30%, rgba(232, 167, 102, 0.025), transparent 60%),
+      var(--bg);
+    display: flex;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  /* ─────── SIDEBAR ─────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--line-soft);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 0;
+    z-index: 50;
+  }
+
+  .sidebar-collapse {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 18px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .sidebar-collapse:hover {
+    background: var(--surface-1);
+    color: var(--ink);
+  }
+
+  .sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 10px;
+  }
+  .sidebar-section + .sidebar-section {
+    margin-top: auto;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--ink-3);
+    transition: all 0.18s;
+    position: relative;
+  }
+  .nav-item:hover {
+    background: var(--surface-1);
+    color: var(--ink-2);
+  }
+  .nav-item.active {
+    background: var(--surface-1);
+    color: var(--ink);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.6;
+  }
+  .nav-label {
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--line-soft);
+    margin: 14px 16px 14px;
+  }
+
+  .avatar-nav {
+    width: 30px;
+    height: 30px;
+    margin: 8px auto 4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6a4a2e, #8a6a48);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--ink);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* ─────── MAIN ─────── */
+  .main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Top bar inside main */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--line-soft);
+    position: sticky;
+    top: 0;
+    background: rgba(14, 14, 12, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 40;
+  }
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .crumb {
+    color: var(--ink-3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .crumb:hover { color: var(--ink-2); }
+  .crumb.current {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .crumb-sep {
+    color: var(--ink-4);
+    font-size: 12px;
+    display: flex;
+  }
+  .crumb-sep svg { width: 14px; height: 14px; }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: all 0.18s;
+    border: 1px solid transparent;
+  }
+  .topbar-action:hover {
+    background: var(--surface-1);
+    color: var(--ink);
+  }
+  .topbar-action svg { width: 16px; height: 16px; }
+
+  /* Topbar action cluster — divider + ellipsis + publish */
+  .topbar-divider {
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    margin: 0 4px;
+  }
+
+  .topbar-menu-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+  .topbar-menu-btn:hover {
+    background: var(--surface-1);
+    color: var(--ink);
+  }
+  .topbar-menu-btn.open {
+    background: var(--surface-1);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .topbar-menu-btn svg { width: 16px; height: 16px; }
+
+  .topbar-publish-btn {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 9px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .topbar-publish-btn:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -10px rgba(232, 167, 102, 0.4);
+  }
+  .topbar-publish-btn svg { width: 13px; height: 13px; }
+
+  /* Hide the publish CTA in topbar once Published */
+  body.published .topbar-publish-btn,
+  body.published .topbar-menu-btn,
+  body.published .topbar-divider {
+    display: none;
+  }
+
+  /* ─────── CONTAINER ─────── */
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ─────── HERO ─────── */
+  .hero {
+    padding: 48px 0 64px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 44px;
+    align-items: start;
+  }
+
+  /* ─────── PLAYER (left) ─────── */
+  .player {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,0.6);
+  }
+
+  .player-video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .video-frame {
+    position: absolute;
+    inset: 0;
+    display: flex;
+  }
+  .video-half {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .video-half.host {
+    background: radial-gradient(ellipse at 50% 38%, #6a4a2e 0%, #2a1f15 55%, #15100a 100%);
+  }
+  .video-half.guest {
+    background: radial-gradient(ellipse at 50% 42%, #5a3e28 0%, #251a12 55%, #100c08 100%);
+  }
+  .silhouette {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55%;
+    height: 80%;
+  }
+  .silhouette::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 60%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.65), transparent 70%);
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  }
+  .silhouette::after {
+    content: '';
+    position: absolute;
+    bottom: 55%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 42%;
+    aspect-ratio: 1;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55), transparent 70%);
+    border-radius: 50%;
+  }
+  .video-half::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.5));
+  }
+  .name-tag {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 3;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: rgba(0,0,0,0.5);
+    padding: 5px 9px;
+    border-radius: 4px;
+    backdrop-filter: blur(6px);
+  }
+  .video-half + .video-half .name-tag { left: auto; right: 14px; }
+
+  /* Edited badge */
+  .edited-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(14, 14, 12, 0.78);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    padding: 7px 12px;
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .edited-badge .badge-icon { color: var(--accent); display: flex; }
+  .edited-badge .removed { color: var(--accent); font-weight: 500; }
+
+  /* Volume in top-right */
+  .video-utility {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 4;
+    display: flex;
+    gap: 6px;
+  }
+  .video-util-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(14, 14, 12, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .video-util-btn:hover {
+    color: var(--ink);
+    background: rgba(14, 14, 12, 0.85);
+  }
+  .video-util-btn svg { width: 14px; height: 14px; }
+
+  /* Play hint */
+  .play-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    background: rgba(0,0,0,0.15);
+  }
+  .play-hint-btn {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a0e02;
+    box-shadow: 0 16px 40px -10px rgba(232, 167, 102, 0.5);
+  }
+  .play-hint-btn svg { width: 24px; height: 24px; margin-left: 3px; }
+  .player-video:hover .play-hint { opacity: 1; }
+
+  /* Transport */
+  .player-transport {
+    padding: 16px 18px 14px;
+    background: linear-gradient(180deg, var(--surface-1), #15140f);
+    border-top: 1px solid var(--line);
+  }
+  .scrubber-section {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .transport-play {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    align-self: center;
+  }
+  .transport-play:hover {
+    background: var(--accent);
+    transform: scale(1.04);
+  }
+  .transport-play svg { width: 14px; height: 14px; margin-left: 2px; }
+
+  .scrubber-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding-top: 22px;
+    padding-bottom: 10px;
+  }
+  .wf-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    pointer-events: none;
+  }
+  .wf-marker {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .wf-marker-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .wf-marker-label.star { color: var(--accent); }
+  .wf-marker:hover .wf-marker-label { color: var(--ink); }
+  .wf-marker-line {
+    width: 1px;
+    height: 6px;
+    background: var(--ink-4);
+  }
+  .wf-marker-line.star { background: var(--accent); }
+
+  .scrubber {
+    position: relative;
+    height: 54px;
+    cursor: pointer;
+  }
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 100%;
+    width: 100%;
+  }
+  .wf-bar {
+    flex: 1;
+    background: var(--ink-4);
+    border-radius: 0.5px;
+    min-width: 2px;
+  }
+  .wf-bar.played { background: var(--ink); }
+  .wf-bar.highlight { background: var(--ink-2); }
+  .wf-bar.peak {
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .wf-bar.peak:hover { background: #f3b573; }
+
+  /* Peak tooltip */
+  .peak-tooltip {
+    position: absolute;
+    background: var(--surface-2);
+    border: 1px solid var(--accent-dim);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink);
+    white-space: nowrap;
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6);
+    transform: translate(-50%, -100%);
+    margin-top: -14px;
+  }
+  .peak-tooltip.visible { opacity: 1; }
+  .peak-tooltip .peak-tooltip-label {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .peak-tooltip .peak-tooltip-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-2);
+    max-width: 280px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+  .playhead {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: var(--ink);
+    z-index: 4;
+    pointer-events: none;
+  }
+  .playhead::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .scrubber-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.04em;
+  }
+
+  /* Right side of transport: speed */
+  .transport-speed {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    align-self: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .transport-speed:hover { color: var(--ink); border-color: var(--ink-4); }
+
+  /* ─────── HERO INFO (right) ─────── */
+  .hero-info {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-top: 6px;
+    align-self: center;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 42px;
+    line-height: 1.1;
+    letter-spacing: -0.028em;
+    color: var(--ink);
+  }
+  .hero-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-3);
+    max-width: 480px;
+  }
+
+  /* Stats grid — restored */
+  .edit-proof {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .proof-cell {
+    flex: 1;
+    padding: 16px 18px;
+    border-right: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .proof-cell:last-child { border-right: none; }
+  .proof-cell.highlight { background: var(--accent-glow); }
+  .proof-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .proof-cell.highlight .proof-label { color: var(--accent); }
+  .proof-value {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .proof-cell.highlight .proof-value { color: var(--accent); }
+
+  .ai-note {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    padding: 4px 0 4px 16px;
+    border-left: 1px solid var(--accent-dim);
+  }
+  .ai-note .timestamp {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11.5px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .ai-note-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.2s;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2px;
+  }
+  .ai-note-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent-dim);
+  }
+
+  /* Edit markers — sit BELOW the waveform, opposite to chapter markers */
+  .edit-marks {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    pointer-events: none;
+  }
+  .edit-mark {
+    position: absolute;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ink-4);
+    border: 1px solid var(--bg);
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .edit-mark:hover {
+    background: var(--accent);
+    transform: translateX(-50%) scale(1.4);
+  }
+  .edit-mark::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--accent);
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+  }
+  .edit-mark:hover::after {
+    opacity: 1;
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+    align-items: stretch;
+  }
+  .btn {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 16px 22px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #1a0e02;
+    font-weight: 600;
+    flex: 1;
+  }
+  .btn-primary:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px -10px rgba(232, 167, 102, 0.4);
+  }
+
+  /* Ellipsis menu button */
+  .menu-wrap {
+    position: relative;
+  }
+  .menu-btn {
+    width: 52px;
+    height: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+  }
+  .menu-btn:hover {
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
+  .menu-btn.open {
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
+  .menu-btn svg { width: 16px; height: 16px; }
+
+  .menu-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+    min-width: 220px;
+    padding: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: all 0.18s ease;
+    z-index: 60;
+  }
+  .menu-popup.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--ink-2);
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .menu-item:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+  .menu-item svg { width: 15px; height: 15px; color: var(--ink-3); }
+  .menu-item:hover svg { color: var(--ink-2); }
+
+  /* ─────── SECTIONS ─────── */
+  .section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 24px;
+  }
+  .section-title-block { display: flex; flex-direction: column; gap: 8px; }
+  .section-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .section-sub {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-3);
+    max-width: 580px;
+    line-height: 1.5;
+  }
+  .section-meta {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Section header action buttons */
+  .section-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .section-btn-ghost {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .section-btn-ghost:hover {
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
+  .section-btn-primary {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .section-btn-primary:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px -8px rgba(232, 167, 102, 0.4);
+  }
+
+  /* Titles */
+  .titles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .title-option {
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface-1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .title-option:hover { border-color: var(--ink-4); }
+  .title-option.selected {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .title-tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .title-option.selected .title-tag { color: var(--accent); }
+  .title-text {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 16.5px;
+    line-height: 1.35;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  /* Clips */
+  .clips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .clip-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .clip-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--ink-4);
+  }
+  .clip-visual {
+    aspect-ratio: 9 / 12;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 35%, #4a3525 0%, #2a1f15 50%, #15100a 100%);
+  }
+  .clip-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(232, 167, 102, 0.12), transparent 50%),
+      linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.65));
+  }
+  .clip-silhouette {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 70%;
+    z-index: 1;
+  }
+  .clip-silhouette::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 65%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.55), transparent 70%);
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  }
+  .clip-silhouette::after {
+    content: '';
+    position: absolute;
+    bottom: 58%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    aspect-ratio: 1;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.5), transparent 70%);
+    border-radius: 50%;
+  }
+  .clip-caption-overlay {
+    position: absolute;
+    bottom: 18px;
+    left: 16px;
+    right: 16px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink);
+    z-index: 2;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+  }
+  .clip-caption-overlay .highlight-word {
+    background: var(--accent);
+    color: #1a0e02;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .clip-duration {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--ink-2);
+    backdrop-filter: blur(8px);
+    z-index: 2;
+  }
+  .clip-tag-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 2;
+    font-weight: 500;
+  }
+  .clip-meta {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+  }
+  .clip-reason-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .clip-reason {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    letter-spacing: -0.005em;
+    font-style: italic;
+  }
+  .clip-reason .ts {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .clip-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    margin-top: auto;
+  }
+  .clip-share {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .clip-share:hover {
+    background: var(--accent);
+    color: #1a0e02;
+    border-color: var(--accent);
+  }
+  .clip-share svg { width: 13px; height: 13px; }
+  .clip-edit {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .clip-edit:hover {
+    color: var(--ink);
+    border-color: var(--ink-4);
+  }
+  .clip-edit svg { width: 13px; height: 13px; }
+  .format-pill {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    transition: all 0.18s;
+    cursor: pointer;
+  }
+  .format-pill:hover { color: var(--ink-2); border-color: var(--ink-4); }
+  .format-pill.active {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .clip-action {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .clip-action:hover { color: var(--ink); }
+
+  .clips-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .show-more {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .show-more:hover { color: var(--ink); }
+  .refine-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  .refine-link:hover { opacity: 0.8; }
+
+  /* Promo */
+  .promo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .promo-card {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: all 0.2s;
+    min-height: 240px;
+  }
+  .promo-card:hover { border-color: var(--ink-4); }
+  .promo-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .promo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+  }
+  .promo-channel {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .promo-name {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .promo-preview {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-3);
+    flex: 1;
+    padding: 12px 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .promo-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: space-between;
+  }
+  .promo-primary {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .promo-primary:hover { color: var(--accent); }
+  .promo-secondary {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .promo-secondary:hover { color: var(--ink); }
+  .promo-leverage {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .leverage-stat {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .leverage-stat strong {
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  /* Redirect */
+  /* Redirect */
+  .redirect-section { padding: 48px 0 80px; }
+  .redirect-wrap {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    background: var(--surface-1);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: border-color 0.2s;
+  }
+  .redirect-wrap:focus-within {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .redirect-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .redirect-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 17px;
+    width: 100%;
+    letter-spacing: -0.005em;
+  }
+  .redirect-input::placeholder {
+    color: var(--ink-4);
+    font-style: italic;
+  }
+  .redirect-submit {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .redirect-submit:hover { color: var(--ink); border-color: var(--ink-4); }
+
+  .icon-sm { width: 14px; height: 14px; }
+
+  /* ─────── LISTEN-BACK OVERLAY ─────── */
+  .listen-back {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .listen-back.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .listen-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 50%, rgba(232, 167, 102, 0.06), transparent 70%),
+      radial-gradient(ellipse 80% 50% at 50% 100%, rgba(232, 167, 102, 0.03), transparent 60%);
+    pointer-events: none;
+  }
+
+  .lb-inner {
+    position: relative;
+    width: 720px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .lb-mark {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--ink-3);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink-2);
+    opacity: 0;
+    animation: lbFadeIn 0.6s ease forwards;
+  }
+
+  .lb-handoff {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-2);
+    letter-spacing: -0.01em;
+    opacity: 0;
+    animation: lbFadeIn 0.6s ease 0.1s forwards;
+  }
+
+  .lb-waveform {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+  }
+  .lb-bar {
+    flex: 1;
+    background: var(--ink-4);
+    border-radius: 1px;
+    min-width: 2px;
+    opacity: 0;
+    transform: scaleY(0.2);
+    transform-origin: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .lb-bar.revealed {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  .lb-bar.scanning {
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(232, 167, 102, 0.4);
+  }
+
+  /* The leading edge of the scan */
+  .lb-scan-line {
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    width: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 20px var(--accent), 0 0 40px rgba(232, 167, 102, 0.3);
+    left: 0%;
+    transition: left 4s linear;
+    opacity: 0;
+  }
+  .lb-scan-line.active { opacity: 1; }
+
+  .lb-status-wrap {
+    height: 28px;
+    position: relative;
+    width: 100%;
+    text-align: center;
+  }
+  .lb-status {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 19px;
+    color: var(--ink-2);
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .lb-status.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .lb-status .ts-num {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 16px;
+    letter-spacing: 0;
+  }
+
+  @keyframes lbFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Body locks scroll while listen-back is up */
+  body.lb-active { overflow: hidden; }
+
+  /* ─────── PUBLISH MODAL ─────── */
+  .modal-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .modal-scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal {
+    width: 620px;
+    max-width: 100%;
+    max-height: calc(100vh - 80px);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal-scrim.open .modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .modal-header {
+    padding: 28px 32px 22px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+  .modal-title-block { display: flex; flex-direction: column; gap: 6px; }
+  .modal-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .modal-subtitle {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    color: var(--ink-3);
+  }
+  .modal-subtitle .sep { color: var(--ink-4); margin: 0 8px; }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { color: var(--ink); border-color: var(--ink-4); }
+  .modal-close svg { width: 16px; height: 16px; }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .modal-section {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .modal-section:last-child { border-bottom: none; }
+  .modal-section.hidden { display: none; }
+
+  .modal-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+
+  .dest-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+  }
+  .dest-row + .dest-row { border-top: 1px solid var(--line-soft); }
+
+  .dest-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    flex-shrink: 0;
+  }
+  .dest-icon svg { width: 16px; height: 16px; }
+
+  .dest-info { flex: 1; min-width: 0; }
+  .dest-name {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dest-meta {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 3px;
+  }
+  .dest-meta .meta-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    margin-left: 6px;
+  }
+
+  /* Toggle */
+  .toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--ink-3);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  .toggle.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .toggle.on::after {
+    left: 18px;
+    background: #1a0e02;
+  }
+
+  /* Timing */
+  .timing-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .timing-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .timing-option:hover { border-color: var(--ink-4); }
+  .timing-option.selected {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .timing-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-4);
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.18s;
+  }
+  .timing-option.selected .timing-radio {
+    border-color: var(--accent);
+  }
+  .timing-option.selected .timing-radio::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .timing-content { flex: 1; }
+  .timing-label {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .timing-detail {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink-3);
+    margin-top: 3px;
+  }
+  .timing-detail .smart-tag {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+
+  /* Modal footer */
+  .modal-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .modal-footer-left {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+  .modal-footer-left strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .modal-footer-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .modal-btn-secondary {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: color 0.18s;
+  }
+  .modal-btn-secondary:hover { color: var(--ink); }
+  .modal-btn-primary {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 11px 20px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-btn-primary:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -10px rgba(232, 167, 102, 0.4);
+  }
+  .modal-btn-primary svg { width: 14px; height: 14px; }
+
+  /* ─────── PUBLISHING / PUBLISHED STATE ─────── */
+  /* Replaces the hero contents when publish is confirmed */
+
+  .publish-state {
+    display: none;
+    padding: 56px 0 64px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .publish-state.active { display: block; }
+
+  body.publishing .hero,
+  body.published .hero { display: none; }
+  body.publishing .publish-state,
+  body.published .publish-state { display: block; }
+
+  /* Sections below fade slightly during publishing */
+  body.publishing .section,
+  body.publishing .redirect-section {
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  /* In Published state, sections come back to full life */
+  body.published .section,
+  body.published .redirect-section {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Hide Publishing layout when Published */
+  body.published .publishing-layout { display: none; }
+  /* Hide Published layout while in Publishing */
+  .published-layout { display: none; }
+  body.published .published-layout { display: block; }
+
+  .ps-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* LEFT: status block */
+  .ps-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .ps-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 6px 12px;
+    border: 1px solid var(--accent-dim);
+    background: var(--accent-glow);
+    border-radius: 100px;
+    align-self: flex-start;
+    transition: all 0.4s ease;
+  }
+  .ps-eyebrow .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  body.publishing .ps-eyebrow .dot {
+    animation: psPulse 1.2s ease-in-out infinite;
+  }
+  body.published .ps-eyebrow .dot {
+    animation: psPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes psPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .ps-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 38px;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .ps-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .ps-sub {
+    font-family: var(--sans);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-3);
+    max-width: 460px;
+  }
+
+  /* Overall progress bar */
+  .ps-overall {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ps-overall-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .ps-overall-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ps-overall-pct {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .ps-overall-bar {
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+  .ps-overall-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.6s ease;
+    box-shadow: 0 0 16px rgba(232, 167, 102, 0.5);
+  }
+
+  /* Next action prompt — shown only in Published state */
+  .ps-next {
+    display: none;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    flex-direction: column;
+    gap: 14px;
+  }
+  body.published .ps-next { display: flex; }
+
+  .ps-next-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .ps-next-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .ps-next-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .ps-next-primary {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 18px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .ps-next-primary:hover {
+    background: var(--accent);
+    color: #1a0e02;
+    border-color: var(--accent);
+  }
+  .ps-next-primary svg { width: 13px; height: 13px; }
+  .ps-next-secondary {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    color: var(--ink-3);
+    background: transparent;
+    border: none;
+    padding: 11px 8px;
+    cursor: pointer;
+    transition: color 0.18s;
+  }
+  .ps-next-secondary:hover { color: var(--ink); }
+
+  /* RIGHT: destinations list */
+  .ps-right {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .ps-right-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ps-right-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .ps-right-counter {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .ps-dest-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .ps-dest {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--line-soft);
+    transition: all 0.3s ease;
+  }
+  .ps-dest:last-child { border-bottom: none; }
+
+  .ps-dest-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    flex-shrink: 0;
+    transition: color 0.3s;
+  }
+  .ps-dest.uploading .ps-dest-icon,
+  .ps-dest.processing .ps-dest-icon,
+  .ps-dest.published .ps-dest-icon {
+    color: var(--ink);
+  }
+  .ps-dest-icon svg { width: 14px; height: 14px; }
+
+  .ps-dest-info { flex: 1; min-width: 0; }
+  .ps-dest-name {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .ps-dest-status {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 3px;
+    transition: color 0.3s;
+    min-height: 16px;
+  }
+  .ps-dest.published .ps-dest-status { color: var(--accent); }
+
+  /* Per-row status indicator */
+  .ps-dest-state {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .ps-dest-state .state-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ink-4);
+    transition: all 0.3s ease;
+  }
+  .ps-dest.uploading .state-dot {
+    background: var(--accent);
+    animation: psPulse 1.2s ease-in-out infinite;
+  }
+  .ps-dest.processing .state-dot {
+    background: var(--accent);
+    animation: psPulse 1.8s ease-in-out infinite;
+  }
+  .ps-dest.published .state-dot {
+    background: var(--accent);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ps-dest.published .state-dot::before {
+    content: '';
+    width: 6px;
+    height: 3px;
+    border-left: 1.5px solid #1a0e02;
+    border-bottom: 1.5px solid #1a0e02;
+    transform: rotate(-45deg) translate(0.5px, -0.5px);
+  }
+
+  /* View link shown in published rows after everything completes */
+  .ps-dest-view {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    border-bottom: 1px solid transparent;
+  }
+  body.published .ps-dest.published .ps-dest-view {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ps-dest-view:hover { border-bottom-color: var(--accent); }
+
+  /* Demo controls — only for the prototype */
+  .demo-reset {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 95;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 8px 14px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.18s;
+    backdrop-filter: blur(10px);
+  }
+  body.publishing .demo-reset,
+  body.published .demo-reset {
+    display: inline-flex;
+  }
+  .demo-reset:hover {
+    color: var(--ink);
+    border-color: var(--ink-4);
+  }
+  .demo-reset svg { width: 11px; height: 11px; }
+
+  /* ─────── PUBLISHED LAYOUT (the calm destination state) ─────── */
+
+  /* Mode-driven variant visibility */
+  .pl-eyebrow-text-scheduled,
+  .pl-title-scheduled,
+  .pl-meta-mode-scheduled,
+  .pl-state-scheduled,
+  .pl-next-title-scheduled { display: none; }
+
+  body.mode-scheduled .pl-eyebrow-text-live,
+  body.mode-scheduled .pl-title-live,
+  body.mode-scheduled .pl-meta-mode-live,
+  body.mode-scheduled .pl-state-live,
+  body.mode-scheduled .pl-next-title-live { display: none; }
+
+  body.mode-scheduled .pl-eyebrow-text-scheduled,
+  body.mode-scheduled .pl-title-scheduled,
+  body.mode-scheduled .pl-meta-mode-scheduled,
+  body.mode-scheduled .pl-next-title-scheduled { display: inline; }
+
+  /* pl-state-scheduled is a flex row when active */
+  body.mode-scheduled .pl-state-scheduled { display: flex; }
+
+  /* Section copy variants — these appear inline inside h2/p */
+  .section-title-published .pl-state-scheduled,
+  .section-sub-published .pl-state-scheduled,
+  .clip-status-badge .pl-state-scheduled { display: none; }
+  .section-title-published .pl-state-live,
+  .section-sub-published .pl-state-live,
+  .clip-status-badge .pl-state-live { display: inline; }
+  body.mode-scheduled .section-title-published .pl-state-live,
+  body.mode-scheduled .section-sub-published .pl-state-live,
+  body.mode-scheduled .clip-status-badge .pl-state-live { display: none; }
+  body.mode-scheduled .section-title-published .pl-state-scheduled,
+  body.mode-scheduled .section-sub-published .pl-state-scheduled,
+  body.mode-scheduled .clip-status-badge .pl-state-scheduled { display: inline; }
+
+  /* Hide the entire Titles section once published or scheduled */
+  body.published .section-titles { display: none; }
+
+  /* "Edit title" affordance — appears next to the chosen title in scheduled mode only */
+  .pl-title-edit {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink-3);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 14px; /* aligns roughly with the title's first line */
+  }
+  .pl-title-edit:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .pl-title-edit svg { width: 12px; height: 12px; }
+  body.mode-scheduled .pl-title-edit { display: inline-flex; }
+
+  /* ─────── TITLE EDIT MODAL ─────── */
+  .te-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 110;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .te-scrim.open { opacity: 1; pointer-events: auto; }
+
+  .te-modal {
+    width: 520px;
+    max-width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+    transform: translateY(20px) scale(0.98);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: calc(100vh - 80px);
+  }
+  .te-scrim.open .te-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .te-header {
+    padding: 26px 28px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .te-title-block { display: flex; flex-direction: column; gap: 6px; }
+  .te-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .te-subtitle {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .te-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .te-close:hover { color: var(--ink); border-color: var(--ink-4); }
+  .te-close svg { width: 15px; height: 15px; }
+
+  .te-body {
+    padding: 22px 28px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .te-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .te-option {
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--surface-1);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .te-option:hover { border-color: var(--ink-4); }
+  .te-option.selected {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .te-option-tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .te-option.selected .te-option-tag { color: var(--accent); }
+  .te-option-text {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 15.5px;
+    line-height: 1.35;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .te-custom-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-top: 4px;
+  }
+  .te-custom-input {
+    width: 100%;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 15.5px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    outline: none;
+    transition: all 0.18s;
+    resize: none;
+  }
+  .te-custom-input::placeholder {
+    color: var(--ink-4);
+    font-style: italic;
+  }
+  .te-custom-input:focus {
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+
+  .te-footer {
+    padding: 16px 28px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .te-btn-secondary {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-3);
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: color 0.18s;
+  }
+  .te-btn-secondary:hover { color: var(--ink); }
+  .te-btn-primary {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .te-btn-primary:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -10px rgba(232, 167, 102, 0.4);
+  }
+
+  /* In scheduled mode, eyebrow check becomes a clock icon-feel — quieter */
+  body.mode-scheduled .pl-eyebrow .check {
+    background: var(--surface-2);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+  }
+  body.mode-scheduled .pl-eyebrow .check svg { display: none; }
+  body.mode-scheduled .pl-eyebrow .check::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* In scheduled mode, ripples are static (no animation) — nothing's broadcasting yet */
+  body.mode-scheduled .pl-ripple::before,
+  body.mode-scheduled .pl-ripple::after {
+    animation: none;
+    opacity: 0.25;
+    transform: scale(2);
+    border-style: dashed;
+  }
+
+  .pl-wrap {
+    padding: 56px 0 56px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .pl-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 40px;
+    max-width: 760px;
+  }
+
+  .pl-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 6px 12px;
+    border: 1px solid var(--accent-dim);
+    background: var(--accent-glow);
+    border-radius: 100px;
+  }
+  .pl-eyebrow .check {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a0e02;
+  }
+  .pl-eyebrow .check svg { width: 9px; height: 9px; }
+
+  .pl-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .pl-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* The chosen title (the actual published episode name) */
+  .pl-chosen-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    max-width: 820px;
+    margin: 4px 0 0 0;
+  }
+  .pl-chosen-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--ink-2);
+    padding: 14px 0 14px 20px;
+    border-left: 2px solid var(--accent-dim);
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ─────── POST-PUBLISH STATE for sections ─────── */
+  /* Hide post-publish variants by default */
+  .section-title-published,
+  .section-sub-published,
+  .clip-status-badge,
+  .clip-actions-published {
+    display: none;
+  }
+  /* In Published state, swap visibility */
+  body.published .section-title-launchpad,
+  body.published .section-sub-launchpad,
+  body.published .clip-actions-launchpad,
+  body.published .section-actions-launchpad {
+    display: none;
+  }
+  body.published .section-title-published,
+  body.published .section-sub-published {
+    display: block;
+  }
+  body.published .clip-status-badge { display: inline-flex; }
+  body.published .clip-actions-published { display: flex; }
+
+  /* Clip status badge — top-left of clip visual, like the edited badge in player */
+  .clip-status-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    align-items: center;
+    gap: 6px;
+    background: rgba(14, 14, 12, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--accent-dim);
+    padding: 5px 10px 5px 6px;
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    z-index: 4;
+    font-weight: 500;
+  }
+  .clip-status-badge .check-mark {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1a0e02;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .clip-status-badge .check-mark svg { width: 8px; height: 8px; }
+
+  /* Hide the "tag" overlay (Hook/Quotable/Peak) when the status badge is showing */
+  body.published .clip-tag-overlay { display: none; }
+
+  /* Subtle border + glow on published clip cards */
+  body.published .clip-card[data-clip-state="published"] {
+    border-color: var(--accent-dim);
+    background: linear-gradient(180deg, rgba(232, 167, 102, 0.04), var(--surface-1) 60%);
+  }
+
+  /* Clip platforms + View — the post-publish actions */
+  .clip-actions-published {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    margin-top: auto;
+  }
+  .clip-platforms {
+    display: flex;
+    gap: 6px;
+  }
+  .clip-platform {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    transition: all 0.18s;
+  }
+  .clip-platform svg { width: 11px; height: 11px; }
+  .clip-platform:hover {
+    color: var(--ink);
+    border-color: var(--ink-4);
+  }
+
+  .clip-view {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent-dim);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .clip-view:hover {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .clip-view svg { width: 11px; height: 11px; }
+
+  /* Extra prompt in published subtitle */
+  .section-sub-published .extra-prompt {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--accent-dim);
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  .pl-meta {
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pl-meta .sep { color: var(--ink-4); }
+
+  /* ─── The waveform band ─── */
+  .pl-waveform-band {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 36px 36px 28px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pl-waveform-band::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 50%, rgba(232, 167, 102, 0.05), transparent 70%);
+    pointer-events: none;
+  }
+
+  .pl-wf-wrap {
+    position: relative;
+    padding-top: 26px;
+    padding-bottom: 8px;
+  }
+
+  /* Chapter/clip markers above */
+  .pl-wf-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 22px;
+    pointer-events: none;
+  }
+  .pl-wf-marker {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .pl-wf-marker-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .pl-wf-marker-label.star { color: var(--accent); }
+  .pl-wf-marker-line {
+    width: 1px;
+    height: 6px;
+    background: var(--ink-4);
+  }
+  .pl-wf-marker-line.star { background: var(--accent); }
+
+  /* The waveform itself */
+  .pl-wf {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 80px;
+    position: relative;
+  }
+  .pl-wf-bar {
+    flex: 1;
+    background: var(--ink-2);
+    border-radius: 0.5px;
+    min-width: 2px;
+    opacity: 0;
+    transform: scaleY(0.3);
+    transform-origin: center;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pl-wf-bar.revealed {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  .pl-wf-bar.highlight {
+    background: var(--ink);
+  }
+  .pl-wf-bar.peak {
+    background: var(--accent);
+  }
+
+  /* Ripple emitters — sit at the clip-peak positions */
+  .pl-ripple {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .pl-ripple::before,
+  .pl-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    opacity: 0;
+    animation: rippleOut 3.6s ease-out infinite;
+  }
+  .pl-ripple::after {
+    animation-delay: 1.8s;
+  }
+  @keyframes rippleOut {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(6);
+      opacity: 0;
+    }
+  }
+
+  .pl-wf-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-4);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── Where it lives strip ─── */
+  .pl-destinations {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .pl-dest {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 160px;
+  }
+  .pl-dest:hover {
+    border-color: var(--ink-4);
+    transform: translateY(-1px);
+  }
+  .pl-dest-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2);
+    flex-shrink: 0;
+  }
+  .pl-dest-icon svg { width: 14px; height: 14px; }
+
+  .pl-dest-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pl-dest-name {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .pl-dest-state {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .pl-dest-state .live-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .pl-dest-state.scheduled .live-dot {
+    background: var(--ink-3);
+    box-shadow: none;
+  }
+
+  .pl-dest-arrow {
+    color: var(--ink-4);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .pl-dest:hover .pl-dest-arrow {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+  .pl-dest-arrow svg { width: 12px; height: 12px; }
+
+  /* ─── Next action card (full-width) ─── */
+  .pl-next {
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .pl-next-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pl-next-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .pl-next-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    max-width: 580px;
+  }
+  .pl-next-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .pl-next-primary {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.18s;
+  }
+  .pl-next-primary:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -10px rgba(232, 167, 102, 0.4);
+  }
+  .pl-next-primary svg { width: 13px; height: 13px; }
+  .pl-next-secondary {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    color: var(--ink-3);
+    background: transparent;
+    border: none;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: color 0.18s;
+  }
+  .pl-next-secondary:hover { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .pl-destinations { flex-direction: column; }
+    .pl-dest { min-width: 0; }
+    .pl-next { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ─────── EDITS SIDE PANEL ─────── */
+  .edits-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+  }
+  .edits-scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .edits-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 520px;
+    max-width: 92vw;
+    background: var(--bg);
+    border-left: 1px solid var(--line);
+    z-index: 90;
+    transform: translateX(100%);
+    transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -30px 0 80px -30px rgba(0,0,0,0.6);
+  }
+  .edits-panel.open { transform: translateX(0); }
+
+  .edits-header {
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .edits-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .edits-title-block { display: flex; flex-direction: column; gap: 6px; }
+  .edits-title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .edits-subtitle {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .edits-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+  .edits-close:hover {
+    color: var(--ink);
+    border-color: var(--ink-4);
+  }
+  .edits-close svg { width: 16px; height: 16px; }
+
+  .edits-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-glow);
+    border: 1px solid var(--accent-dim);
+    padding: 6px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    align-self: flex-start;
+  }
+
+  .edits-filters {
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .filter-chip {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-3);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 7px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-chip:hover {
+    color: var(--ink-2);
+    border-color: var(--ink-4);
+  }
+  .filter-chip.active {
+    color: var(--ink);
+    background: var(--surface-2);
+    border-color: var(--ink-4);
+  }
+  .filter-chip .filter-count {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-4);
+  }
+  .filter-chip.active .filter-count { color: var(--ink-3); }
+
+  .edits-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .edit-row {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.15s;
+  }
+  .edit-row:hover { background: var(--surface-1); }
+  .edit-row.restored { opacity: 0.5; }
+  .edit-row.restored .edit-reason { text-decoration: line-through; }
+
+  .edit-row-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .edit-timestamp {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-2);
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+    padding: 4px 9px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+  .edit-category {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .edit-duration {
+    margin-left: auto;
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+
+  .edit-reason {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    letter-spacing: -0.005em;
+  }
+  .edit-reason strong {
+    color: var(--ink);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .edit-action {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-3);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s;
+  }
+  .edit-action:hover {
+    color: var(--ink);
+    border-color: var(--ink-4);
+  }
+  .edit-action.restore:hover {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+    background: var(--accent-glow);
+  }
+  .edit-action svg { width: 12px; height: 12px; }
+  .edit-row.restored .edit-action.restore { color: var(--accent); border-color: var(--accent-dim); }
+
+  .edits-footer {
+    padding: 20px 28px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .edits-footer-note {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .edits-footer-note strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .edits-apply {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a0e02;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .edits-apply:hover {
+    background: #f3b573;
+    transform: translateY(-1px);
+  }
+  .edits-apply:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (max-width: 1180px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .clips-grid { grid-template-columns: 1fr 1fr; }
+    .promo-grid { grid-template-columns: 1fr 1fr; }
+    .titles { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="lb-active">
+
+<!-- ─────── LISTEN-BACK OVERLAY ─────── -->
+<div class="listen-back" id="listenBack">
+  <div class="lb-inner">
+    <div class="lb-mark">~</div>
+    <div class="lb-handoff" id="lbHandoff">Good session.</div>
+    <div class="lb-waveform" id="lbWaveform">
+      <div class="lb-scan-line" id="lbScanLine"></div>
+    </div>
+    <div class="lb-status-wrap">
+      <div class="lb-status" id="lbStatus"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────── SIDEBAR ─────── -->
+<aside class="sidebar">
+  <div class="sidebar-collapse" title="Collapse sidebar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+  </div>
+
+  <div class="sidebar-section">
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-label">Projects</span>
+    </a>
+    <a href="#" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4.5 16.5L12 4l7.5 12.5"/><path d="M12 4v17"/><circle cx="12" cy="11" r="1.8" fill="currentColor" stroke="none"/></svg>
+      <span class="nav-label">Launchpad</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span class="nav-label">Planner</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.48m-8.48 0a6 6 0 0 1 0-8.48M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+      <span class="nav-label">Hosting</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+      <span class="nav-label">Invite</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <span class="nav-label">Record</span>
+    </a>
+    <div class="sidebar-divider"></div>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      <span class="nav-label">Settings</span>
+    </a>
+    <div class="avatar-nav">JM</div>
+  </div>
+</aside>
+
+<!-- ─────── MAIN ─────── -->
+<main class="main">
+
+  <!-- Topbar with breadcrumbs -->
+  <nav class="topbar">
+    <div class="breadcrumbs">
+      <a href="#" class="crumb">Studio</a>
+      <span class="crumb-sep">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18l6-6-6-6"/></svg>
+      </span>
+      <a href="#" class="crumb">Content Launchpad</a>
+      <span class="crumb-sep">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18l6-6-6-6"/></svg>
+      </span>
+      <span class="crumb current">Episode 47</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-action" title="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+      <div class="topbar-action" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+
+      <div class="topbar-divider"></div>
+
+      <div class="menu-wrap">
+        <button class="topbar-menu-btn" id="menuBtn" aria-label="More options">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        </button>
+        <div class="menu-popup" id="menuPopup">
+          <a href="#" class="menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+            <span>Open in editor</span>
+          </a>
+          <a href="#" class="menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Download original</span>
+          </a>
+        </div>
+      </div>
+
+      <button class="topbar-publish-btn" id="publishBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        Publish episode
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid">
+
+        <!-- LEFT: unified player -->
+        <div class="player">
+          <div class="player-video">
+            <div class="video-frame">
+              <div class="video-half host">
+                <div class="silhouette"></div>
+                <span class="name-tag">Jordan Mills</span>
+              </div>
+              <div class="video-half guest">
+                <div class="silhouette"></div>
+                <span class="name-tag">Sarah Chen</span>
+              </div>
+            </div>
+
+            <div class="edited-badge">
+              <span class="badge-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+              </span>
+              <span>Auto-cut · <span class="removed">11m</span> across <span class="removed">14 edits</span></span>
+            </div>
+
+            <div class="video-utility">
+              <button class="video-util-btn" title="Volume" aria-label="Volume">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              </button>
+            </div>
+
+            <div class="play-hint">
+              <div class="play-hint-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="player-transport">
+            <div class="scrubber-section">
+              <button class="transport-play" aria-label="Play">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+
+              <div class="scrubber-wrap">
+                <div class="wf-markers" id="markers"></div>
+                <div class="scrubber" id="scrubber">
+                  <div class="waveform" id="waveform"></div>
+                  <div class="playhead" style="left: 0%"></div>
+                  <div class="edit-marks" id="editMarks"></div>
+                </div>
+                <div class="scrubber-timeline">
+                  <span>0:00</span>
+                  <span>24:00</span>
+                  <span>48:00</span>
+                  <span>1:12:00</span>
+                  <span>1:36:00</span>
+                </div>
+              </div>
+
+              <button class="transport-speed">1.0×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: title, summary, stats, AI note, CTAs -->
+        <div class="hero-info">
+          <h1 class="hero-title">
+            Your episode is <em>ready.</em>
+          </h1>
+
+          <p class="hero-sub">
+            A conversation about leaving big tech to build something honest.
+            The strongest thread runs from minute 23 to 71 — when Sarah stops
+            performing and starts telling the truth about why she left.
+          </p>
+
+          <p class="ai-note">
+            The most consequential cut: I removed the first four minutes —
+            the real conversation starts when Sarah explains why she stopped
+            reading her own LinkedIn posts. <span class="timestamp">04:12 → 00:00</span>
+            <a href="#" class="ai-note-link" id="editsLink">See all 14 edits →</a>
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PUBLISHING / PUBLISHED STATE -->
+    <section class="publish-state" id="publishState">
+
+      <!-- PUBLISHING layout (during the animation) -->
+      <div class="publishing-layout">
+      <div class="ps-grid">
+
+        <!-- LEFT: status -->
+        <div class="ps-left">
+          <div class="ps-eyebrow" id="psEyebrow">
+            <div class="dot"></div>
+            <span id="psEyebrowText">Publishing · 0 of 7 destinations</span>
+          </div>
+
+          <h1 class="ps-title" id="psTitle">
+            Sending your episode <em>out into the world.</em>
+          </h1>
+
+          <p class="ps-sub" id="psSub">
+            You can leave this page — we'll let you know when it's live on each platform.
+          </p>
+
+          <div class="ps-overall">
+            <div class="ps-overall-top">
+              <span class="ps-overall-label">Overall progress</span>
+              <span class="ps-overall-pct" id="psPct">0%</span>
+            </div>
+            <div class="ps-overall-bar">
+              <div class="ps-overall-fill" id="psFill"></div>
+            </div>
+          </div>
+
+          <!-- Next action: only visible in Published state -->
+          <div class="ps-next">
+            <span class="ps-next-label">What's next</span>
+            <div class="ps-next-title">
+              While this one's still warm — plan your next conversation.
+            </div>
+            <div class="ps-next-actions">
+              <button class="ps-next-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                Open the Planner
+              </button>
+              <button class="ps-next-secondary">Maybe later</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: destinations -->
+        <div class="ps-right">
+          <div class="ps-right-header">
+            <span class="ps-right-title">Destinations</span>
+            <span class="ps-right-counter" id="psCounter">0 / 7 complete</span>
+          </div>
+
+          <div class="ps-dest-list" id="psDestList">
+
+            <!-- Each destination row -->
+            <div class="ps-dest" data-dest="rss" data-duration="1200">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M4 11.5v2a8 8 0 0 1 8 8h2c0-5.523-4.477-10-10-10m0-5v2c7.18 0 13 5.82 13 13h2C19 7.611 12.389 1 4 1z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">Podcast feed (RSS)</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="apple" data-duration="2000">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">Apple Podcasts</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="spotify" data-duration="2400">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">Spotify</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="youtube" data-duration="4500">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">YouTube</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="instagram" data-duration="1600">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">Instagram</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="tiktok" data-duration="1800">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">TikTok</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+            <div class="ps-dest" data-dest="x" data-duration="900">
+              <div class="ps-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </div>
+              <div class="ps-dest-info">
+                <div class="ps-dest-name">X</div>
+                <div class="ps-dest-status">Queued</div>
+              </div>
+              <div class="ps-dest-state">
+                <span class="state-dot"></span>
+                <a class="ps-dest-view">View →</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      </div><!-- /.publishing-layout -->
+
+      <!-- PUBLISHED layout (the destination state) -->
+      <div class="published-layout">
+        <div class="pl-wrap">
+
+          <div class="pl-header">
+            <div class="pl-eyebrow">
+              <span class="check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="pl-eyebrow-text-live">Published · just now</span>
+              <span class="pl-eyebrow-text-scheduled">Scheduled · Tuesday, Mar 17 · 9:00 AM</span>
+            </div>
+            <h1 class="pl-title">
+              <span class="pl-title-live">Your episode is <em>live.</em></span>
+              <span class="pl-title-scheduled">Your episode is <em>queued and waiting.</em></span>
+            </h1>
+            <div class="pl-chosen-title-row">
+              <h2 class="pl-chosen-title" id="plChosenTitle">"I left Google to make something I could explain to my mom"</h2>
+              <button class="pl-title-edit" id="plTitleEdit" title="Edit title before it goes live">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                Edit title
+              </button>
+            </div>
+            <div class="pl-meta">
+              <span>Honest Work</span>
+              <span class="sep">·</span>
+              <span>Episode 47</span>
+              <span class="sep">·</span>
+              <span>1h 36m</span>
+              <span class="sep">·</span>
+              <span class="pl-meta-mode-live">7 destinations live</span>
+              <span class="pl-meta-mode-scheduled">7 destinations · publishes in 4 days</span>
+            </div>
+          </div>
+
+          <!-- The waveform band (the signature recurring element) -->
+          <div class="pl-waveform-band">
+            <div class="pl-wf-wrap">
+              <div class="pl-wf-markers" id="plMarkers"></div>
+              <div class="pl-wf" id="plWaveform"></div>
+              <div class="pl-wf-timeline">
+                <span>0:00</span>
+                <span>24:00</span>
+                <span>48:00</span>
+                <span>1:12:00</span>
+                <span>1:36:00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Where it lives -->
+          <div class="pl-destinations">
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">Apple Podcasts</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">Spotify</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">YouTube</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M4 11.5v2a8 8 0 0 1 8 8h2c0-5.523-4.477-10-10-10m0-5v2c7.18 0 13 5.82 13 13h2C19 7.611 12.389 1 4 1z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">RSS feed</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">Instagram</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">TikTok</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+            <a class="pl-dest" href="#">
+              <div class="pl-dest-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </div>
+              <div class="pl-dest-info">
+                <div class="pl-dest-name">X</div>
+                <div class="pl-dest-state pl-state-live"><span class="live-dot"></span>Live</div>
+                <div class="pl-dest-state scheduled pl-state-scheduled"><span class="live-dot"></span>Scheduled Tue 9 AM</div>
+              </div>
+              <div class="pl-dest-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </div>
+            </a>
+
+          </div>
+
+          <!-- Next action -->
+          <div class="pl-next">
+            <div class="pl-next-left">
+              <span class="pl-next-label">What's next</span>
+              <div class="pl-next-title">
+                <span class="pl-next-title-live">While this one's still warm — plan your next conversation.</span>
+                <span class="pl-next-title-scheduled">Four days until this goes live. Time to plan the next one.</span>
+              </div>
+            </div>
+            <div class="pl-next-actions">
+              <button class="pl-next-secondary">Maybe later</button>
+              <button class="pl-next-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                Open the Planner
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /.published-layout -->
+
+    </section>
+
+    <!-- TITLES -->
+    <section class="section section-titles">
+      <div class="section-header">
+        <div class="section-title-block">
+          <h2 class="section-title">Pick a title</h2>
+          <p class="section-sub">Three angles drafted from the conversation. Pick one, edit it, or write your own.</p>
+        </div>
+        <span class="section-meta">3 angles · or write your own</span>
+      </div>
+
+      <div class="titles">
+        <div class="title-option selected">
+          <div class="title-tag">Direct · pre-selected</div>
+          <div class="title-text">"I left Google to make something I could explain to my mom"</div>
+        </div>
+        <div class="title-option">
+          <div class="title-tag">Curiosity</div>
+          <div class="title-text">Why a Staff Engineer walked away from $400K</div>
+        </div>
+        <div class="title-option">
+          <div class="title-tag">Search</div>
+          <div class="title-text">Sarah Chen on burnout, founder loneliness, and starting over</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIPS -->
+    <section class="section section-clips">
+      <div class="section-header">
+        <div class="section-title-block">
+          <h2 class="section-title section-title-launchpad">Clips worth sharing</h2>
+          <h2 class="section-title section-title-published">
+            <span class="pl-state-live">Your clips, out in the world</span>
+            <span class="pl-state-scheduled">Your clips, queued for Tuesday</span>
+          </h2>
+          <p class="section-sub section-sub-launchpad">Pre-cut and captioned. Pick a destination — format adapts automatically. Or send them all at once.</p>
+          <p class="section-sub section-sub-published">
+            <span class="pl-state-live">3 clips live across Instagram, TikTok, and X.</span>
+            <span class="pl-state-scheduled">3 clips scheduled for Tuesday 9 AM across Instagram, TikTok, and X.</span>
+            <span class="extra-prompt">3 more ready when you want them.</span>
+          </p>
+        </div>
+        <div class="section-actions section-actions-launchpad">
+          <button class="section-btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Schedule all
+          </button>
+          <button class="section-btn-primary" id="shareAllBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+            Share all clips
+          </button>
+        </div>
+      </div>
+
+      <div class="clips-grid">
+        <article class="clip-card" data-clip-state="published">
+          <div class="clip-visual">
+            <div class="clip-silhouette"></div>
+            <span class="clip-tag-overlay">Hook</span>
+            <span class="clip-duration">0:42</span>
+            <div class="clip-status-badge">
+              <span class="check-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="pl-state-live">Live</span><span class="pl-state-scheduled">Scheduled · Tue 9 AM</span>
+            </div>
+            <div class="clip-caption-overlay">
+              "I was making more money than my parents combined and I cried in the bathroom <span class="highlight-word">every Tuesday</span>."
+            </div>
+          </div>
+          <div class="clip-meta">
+            <div class="clip-reason-label">Why this works</div>
+            <div class="clip-reason">
+              Strongest cold-open line. Specific, vulnerable, finishes with a beat that rewards a 3-second hold. <span class="ts">12:08</span>
+            </div>
+            <div class="clip-actions clip-actions-launchpad">
+              <button class="clip-share">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                Share
+              </button>
+              <button class="clip-edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                Edit
+              </button>
+            </div>
+            <div class="clip-actions clip-actions-published">
+              <div class="clip-platforms">
+                <span class="clip-platform" title="Instagram">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </span>
+                <span class="clip-platform" title="TikTok">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+                </span>
+                <span class="clip-platform" title="X">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </span>
+              </div>
+              <button class="clip-view">
+                View
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="clip-card" data-clip-state="published">
+          <div class="clip-visual">
+            <div class="clip-silhouette"></div>
+            <span class="clip-tag-overlay">Quotable</span>
+            <span class="clip-duration">1:08</span>
+            <div class="clip-status-badge">
+              <span class="check-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="pl-state-live">Live</span><span class="pl-state-scheduled">Scheduled · Tue 9 AM</span>
+            </div>
+            <div class="clip-caption-overlay">
+              "Three rules for knowing it's time to leave a job that's <span class="highlight-word">just fine</span>."
+            </div>
+          </div>
+          <div class="clip-meta">
+            <div class="clip-reason-label">Why this works</div>
+            <div class="clip-reason">
+              A framework people will screenshot. Sarah numbers the rules out loud, which makes captions clean. <span class="ts">38:22</span>
+            </div>
+            <div class="clip-actions clip-actions-launchpad">
+              <button class="clip-share">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                Share
+              </button>
+              <button class="clip-edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                Edit
+              </button>
+            </div>
+            <div class="clip-actions clip-actions-published">
+              <div class="clip-platforms">
+                <span class="clip-platform" title="Instagram">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </span>
+                <span class="clip-platform" title="TikTok">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+                </span>
+                <span class="clip-platform" title="X">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </span>
+              </div>
+              <button class="clip-view">
+                View
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="clip-card" data-clip-state="published">
+          <div class="clip-visual">
+            <div class="clip-silhouette"></div>
+            <span class="clip-tag-overlay">Emotional peak</span>
+            <span class="clip-duration">0:55</span>
+            <div class="clip-status-badge">
+              <span class="check-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="pl-state-live">Live</span><span class="pl-state-scheduled">Scheduled · Tue 9 AM</span>
+            </div>
+            <div class="clip-caption-overlay">
+              "I didn't know it was the last time we'd <span class="highlight-word">build something together</span>."
+            </div>
+          </div>
+          <div class="clip-meta">
+            <div class="clip-reason-label">Why this works</div>
+            <div class="clip-reason">
+              Sarah's voice catches here. The pause before "build" is the moment — don't cut it tight. <span class="ts">47:12</span>
+            </div>
+            <div class="clip-actions clip-actions-launchpad">
+              <button class="clip-share">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                Share
+              </button>
+              <button class="clip-edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                Edit
+              </button>
+            </div>
+            <div class="clip-actions clip-actions-published">
+              <div class="clip-platforms">
+                <span class="clip-platform" title="Instagram">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+                </span>
+                <span class="clip-platform" title="TikTok">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+                </span>
+                <span class="clip-platform" title="X">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </span>
+              </div>
+              <button class="clip-view">
+                View
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="clips-footer">
+        <span class="show-more">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Show 3 more clips
+        </span>
+        <span class="refine-link">
+          Refine these suggestions
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </span>
+      </div>
+    </section>
+
+    <!-- PROMO KIT -->
+    <section class="section section-promo">
+      <div class="section-header">
+        <div class="section-title-block">
+          <h2 class="section-title section-title-launchpad">Promote without writing</h2>
+          <h2 class="section-title section-title-published">Still in draft</h2>
+          <p class="section-sub section-sub-launchpad">Drafted from your conversation. Copy, schedule, or edit each one — then push it to where your audience lives.</p>
+          <p class="section-sub section-sub-published">These promo posts weren't part of the episode publish. Push them out whenever you're ready.</p>
+        </div>
+        <span class="section-meta">3 posts · ready to use</span>
+      </div>
+
+      <div class="promo-grid">
+        <div class="promo-card">
+          <div class="promo-card-head">
+            <div class="promo-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <span class="promo-channel">X · Thread</span>
+          </div>
+          <div class="promo-name">A 6-post thread on quitting big tech</div>
+          <div class="promo-preview">"I made $400K a year doing work I couldn't explain to my mom. Here's what changed when I stopped pretending it was fine…"</div>
+          <div class="promo-actions">
+            <a class="promo-primary">
+              Copy thread
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </a>
+            <a class="promo-secondary">Schedule</a>
+          </div>
+        </div>
+
+        <div class="promo-card">
+          <div class="promo-card-head">
+            <div class="promo-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </div>
+            <span class="promo-channel">LinkedIn · Post</span>
+          </div>
+          <div class="promo-name">A first-person reflection post</div>
+          <div class="promo-preview">"Eight years at Google. Three promotions. And one Tuesday I realized I couldn't tell my mom what I actually did all day…"</div>
+          <div class="promo-actions">
+            <a class="promo-primary">
+              Copy post
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </a>
+            <a class="promo-secondary">Schedule</a>
+          </div>
+        </div>
+
+        <div class="promo-card">
+          <div class="promo-card-head">
+            <div class="promo-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M9 8h6M9 16h3"/></svg>
+            </div>
+            <span class="promo-channel">Instagram · Carousel</span>
+          </div>
+          <div class="promo-name">3 quote cards for Instagram</div>
+          <div class="promo-preview">Designed pull-quotes from the conversation, sized for IG carousels — Sarah's three rules, the Tuesday line, and the closing reflection.</div>
+          <div class="promo-actions">
+            <a class="promo-primary">
+              Download set
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </a>
+            <a class="promo-secondary">Customize</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="promo-leverage">
+        <div class="leverage-stat">
+          One conversation, <strong>three posts</strong> ready, <strong>~6 hours</strong> of writing saved.
+        </div>
+        <span class="refine-link">
+          Add more channels
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </span>
+      </div>
+    </section>
+
+    <!-- REDIRECT -->
+    <section class="redirect-section">
+      <div class="redirect-wrap">
+        <div class="redirect-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <input
+          type="text"
+          class="redirect-input"
+          placeholder="Not quite right? Tell me what you wanted instead — &ldquo;focus on the funding story, less on personal background&rdquo;"
+        />
+        <button class="redirect-submit">Regenerate</button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ─────── EDITS SIDE PANEL ─────── -->
+<div class="edits-scrim" id="editsScrim"></div>
+
+<!-- Demo control: reset to fresh Launchpad -->
+<button class="demo-reset" id="demoReset" title="Reset demo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+  Reset demo
+</button>
+
+<!-- ─────── TITLE EDIT MODAL ─────── -->
+<div class="te-scrim" id="teScrim">
+  <div class="te-modal" id="teModal">
+    <div class="te-header">
+      <div class="te-title-block">
+        <h2 class="te-title">Edit your title</h2>
+        <p class="te-subtitle">Your episode is scheduled for Tuesday — change the title anytime before it goes live.</p>
+      </div>
+      <button class="te-close" id="teClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="te-body">
+      <div class="te-options" id="teOptions">
+        <div class="te-option selected" data-title='"I left Google to make something I could explain to my mom"'>
+          <div class="te-option-tag">Direct</div>
+          <div class="te-option-text">"I left Google to make something I could explain to my mom"</div>
+        </div>
+        <div class="te-option" data-title="Why a Staff Engineer walked away from $400K">
+          <div class="te-option-tag">Curiosity</div>
+          <div class="te-option-text">Why a Staff Engineer walked away from $400K</div>
+        </div>
+        <div class="te-option" data-title="Sarah Chen on burnout, founder loneliness, and starting over">
+          <div class="te-option-tag">Search</div>
+          <div class="te-option-text">Sarah Chen on burnout, founder loneliness, and starting over</div>
+        </div>
+      </div>
+
+      <span class="te-custom-label">Or write your own</span>
+      <textarea class="te-custom-input" id="teCustom" rows="2" placeholder="Type a custom title..."></textarea>
+    </div>
+
+    <div class="te-footer">
+      <button class="te-btn-secondary" id="teCancel">Cancel</button>
+      <button class="te-btn-primary" id="teSave">Save title</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────── PUBLISH MODAL ─────── -->
+<div class="modal-scrim" id="publishScrim">
+  <div class="modal" id="publishModal">
+
+    <div class="modal-header">
+      <div class="modal-title-block">
+        <h2 class="modal-title" id="modalTitle">Publish your episode</h2>
+        <p class="modal-subtitle" id="modalSubtitle">
+          <span>1h 36m episode</span><span class="sep">·</span><span>3 clips</span><span class="sep">·</span><span>3 promo posts</span>
+        </p>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Episode destinations (full mode only) -->
+      <div class="modal-section" id="episodeSection">
+        <div class="modal-section-label">Publish the episode to</div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 18.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M4 11.5v2a8 8 0 0 1 8 8h2c0-5.523-4.477-10-10-10m0-5v2c7.18 0 13 5.82 13 13h2C19 7.611 12.389 1 4 1z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">Podcast feed (RSS)</div>
+            <div class="dest-meta">Apple Podcasts, Spotify, Overcast<span class="meta-tag">Audio</span></div>
+          </div>
+          <div class="toggle on" data-toggle="rss"></div>
+        </div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">YouTube</div>
+            <div class="dest-meta">@jordanmills · 12.4k subscribers<span class="meta-tag">Video 16:9</span></div>
+          </div>
+          <div class="toggle on" data-toggle="youtube"></div>
+        </div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">Spotify for Podcasters</div>
+            <div class="dest-meta">Honest Work · 8.2k followers<span class="meta-tag">Audio</span></div>
+          </div>
+          <div class="toggle on" data-toggle="spotify"></div>
+        </div>
+      </div>
+
+      <!-- Clip destinations (both modes) -->
+      <div class="modal-section" id="clipSection">
+        <div class="modal-section-label" id="clipSectionLabel">Share the clips to</div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">Instagram</div>
+            <div class="dest-meta">@jordanmills · 3 clips selected<span class="meta-tag">9:16</span></div>
+          </div>
+          <div class="toggle on" data-toggle="instagram"></div>
+        </div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">TikTok</div>
+            <div class="dest-meta">@jordanmills · 3 clips selected<span class="meta-tag">9:16</span></div>
+          </div>
+          <div class="toggle on" data-toggle="tiktok"></div>
+        </div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">X</div>
+            <div class="dest-meta">@jmills · 3 clips selected<span class="meta-tag">16:9</span></div>
+          </div>
+          <div class="toggle on" data-toggle="x"></div>
+        </div>
+
+        <div class="dest-row">
+          <div class="dest-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+          <div class="dest-info">
+            <div class="dest-name">LinkedIn</div>
+            <div class="dest-meta">Jordan Mills · 3 clips selected<span class="meta-tag">1:1</span></div>
+          </div>
+          <div class="toggle" data-toggle="linkedin"></div>
+        </div>
+      </div>
+
+      <!-- Timing -->
+      <div class="modal-section">
+        <div class="modal-section-label">When to publish</div>
+
+        <div class="timing-options">
+          <div class="timing-option" data-timing="now">
+            <div class="timing-radio"></div>
+            <div class="timing-content">
+              <div class="timing-label">Publish now</div>
+              <div class="timing-detail">Goes live immediately across all destinations</div>
+            </div>
+          </div>
+
+          <div class="timing-option selected" data-timing="scheduled">
+            <div class="timing-radio"></div>
+            <div class="timing-content">
+              <div class="timing-label">Publish at next scheduled time</div>
+              <div class="timing-detail">
+                <span class="smart-tag">Smart</span>Tuesday 9:00 AM — when your audience usually listens
+              </div>
+            </div>
+          </div>
+
+          <div class="timing-option" data-timing="custom">
+            <div class="timing-radio"></div>
+            <div class="timing-content">
+              <div class="timing-label">Pick a custom time</div>
+              <div class="timing-detail">Choose your own date and time</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        Publishing to <strong id="destCount">7 destinations</strong>
+      </div>
+      <div class="modal-footer-right">
+        <button class="modal-btn-secondary">Save as draft</button>
+        <button class="modal-btn-primary" id="modalConfirm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          <span id="modalConfirmText">Publish episode</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<aside class="edits-panel" id="editsPanel">
+  <div class="edits-header">
+    <div class="edits-header-top">
+      <div class="edits-title-block">
+        <h2 class="edits-title">Edits to your conversation</h2>
+        <p class="edits-subtitle">14 changes that took your recording from 1h 47m to 1h 36m.</p>
+      </div>
+      <button class="edits-close" id="editsClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="edits-summary">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      11m removed · 14 edits
+    </div>
+  </div>
+
+  <div class="edits-filters">
+    <button class="filter-chip active" data-filter="all">All <span class="filter-count">14</span></button>
+    <button class="filter-chip" data-filter="filler">Filler <span class="filter-count">5</span></button>
+    <button class="filter-chip" data-filter="tangent">Tangents <span class="filter-count">3</span></button>
+    <button class="filter-chip" data-filter="crosstalk">Cross-talk <span class="filter-count">2</span></button>
+    <button class="filter-chip" data-filter="pause">Pauses <span class="filter-count">2</span></button>
+    <button class="filter-chip" data-filter="repetition">Repetition <span class="filter-count">2</span></button>
+  </div>
+
+  <div class="edits-list">
+
+    <!-- 1: False start -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">00:00 — 04:12</span>
+        <span class="edit-category">False start</span>
+        <span class="edit-duration">−4m 12s</span>
+      </div>
+      <p class="edit-reason">
+        Removed the opening four minutes — you and Sarah were discussing the venue acoustics
+        and equipment setup before getting into the topic. The real conversation begins at 04:12
+        when she explains why she stopped reading her own LinkedIn posts.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 2: Tangent -->
+    <div class="edit-row" data-category="tangent">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">17:32 — 18:44</span>
+        <span class="edit-category">Tangent</span>
+        <span class="edit-duration">−1m 12s</span>
+      </div>
+      <p class="edit-reason">
+        Cut a tangent about a mutual acquaintance's new startup. It didn't connect back to the
+        thread about leaving big tech and broke the momentum after Sarah's opening story.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 3: Filler -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">24:18 — 24:42</span>
+        <span class="edit-category">Cross-talk</span>
+        <span class="edit-duration">−24s</span>
+      </div>
+      <p class="edit-reason">
+        Cleaned up cross-talk where you both started speaking at the same time after Sarah's
+        question about your podcast guests. Kept your response, removed the overlap.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 4: Pause -->
+    <div class="edit-row" data-category="pause">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">31:08 — 31:26</span>
+        <span class="edit-category">Pause</span>
+        <span class="edit-duration">−18s</span>
+      </div>
+      <p class="edit-reason">
+        Trimmed 18 seconds of dead air while Sarah looked up the Patrick Collison essay she
+        wanted to reference. The audience won't miss the silence.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 5: Tangent -->
+    <div class="edit-row restored" data-category="tangent">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">42:14 — 43:44</span>
+        <span class="edit-category">Tangent</span>
+        <span class="edit-duration">−1m 30s</span>
+      </div>
+      <p class="edit-reason">
+        Cut Sarah's story about her dad's reaction to her leaving Google. It pulled away from
+        the framework she was about to introduce.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          Restored
+        </button>
+      </div>
+    </div>
+
+    <!-- 6: Filler -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">52:30 — 52:52</span>
+        <span class="edit-category">Filler</span>
+        <span class="edit-duration">−22s</span>
+      </div>
+      <p class="edit-reason">
+        Removed a cluster of "you knows" and "I mean"s — eight in 22 seconds — while Sarah was
+        warming up to the burnout topic.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 7: Repetition -->
+    <div class="edit-row" data-category="repetition">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">59:48 — 1:00:56</span>
+        <span class="edit-category">Repetition</span>
+        <span class="edit-duration">−1m 8s</span>
+      </div>
+      <p class="edit-reason">
+        Sarah repeated the same point about identity and work three times in different framings.
+        Kept the clearest version (the second one) and cut the bookends.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 8: Cross-talk -->
+    <div class="edit-row" data-category="crosstalk">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:07:22 — 1:07:57</span>
+        <span class="edit-category">Cross-talk</span>
+        <span class="edit-duration">−35s</span>
+      </div>
+      <p class="edit-reason">
+        Removed laughter and overlapping speech during the "three rules" segment so each rule
+        comes through cleanly.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 9: Tangent -->
+    <div class="edit-row" data-category="tangent">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:14:10 — 1:14:50</span>
+        <span class="edit-category">Tangent</span>
+        <span class="edit-duration">−40s</span>
+      </div>
+      <p class="edit-reason">
+        A side conversation about coffee orders. Funny, but it broke the emotional thread right
+        before the closing reflection.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 10: Filler -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:21:04 — 1:21:32</span>
+        <span class="edit-category">Filler</span>
+        <span class="edit-duration">−28s</span>
+      </div>
+      <p class="edit-reason">
+        Trimmed crutch words and false starts as Sarah was setting up the "what comes next"
+        section.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 11: Pause -->
+    <div class="edit-row" data-category="pause">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:28:46 — 1:29:36</span>
+        <span class="edit-category">Pause</span>
+        <span class="edit-duration">−50s</span>
+      </div>
+      <p class="edit-reason">
+        Cut a long pause where Sarah was choosing her words carefully. Kept the breath before
+        her answer — that beat matters — but trimmed the silence after.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 12: Filler -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:34:12 — 1:34:54</span>
+        <span class="edit-category">Filler</span>
+        <span class="edit-duration">−42s</span>
+      </div>
+      <p class="edit-reason">
+        Removed filler around your wrap-up question — a few false starts before you got to the
+        clean version of the question.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 13: Repetition -->
+    <div class="edit-row" data-category="repetition">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:40:28 — 1:41:08</span>
+        <span class="edit-category">Repetition</span>
+        <span class="edit-duration">−40s</span>
+      </div>
+      <p class="edit-reason">
+        Sarah restated her closing thought twice. The second version is sharper — kept that,
+        cut the first run-through.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+    <!-- 14: Filler -->
+    <div class="edit-row" data-category="filler">
+      <div class="edit-row-top">
+        <span class="edit-timestamp">1:45:54 — 1:47:00</span>
+        <span class="edit-category">Filler</span>
+        <span class="edit-duration">−1m 6s</span>
+      </div>
+      <p class="edit-reason">
+        Cut the off-topic chatter after the actual sign-off — you both kept talking after the
+        conversation naturally ended.
+      </p>
+      <div class="edit-actions">
+        <button class="edit-action">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play in context
+        </button>
+        <button class="edit-action restore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restore
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="edits-footer">
+    <div class="edits-footer-note">
+      <strong>1 edit restored</strong> · Final length now 1h 37m 30s
+    </div>
+    <button class="edits-apply">Apply changes</button>
+  </div>
+</aside>
+
+<script>
+  // ─── LISTEN-BACK SEQUENCE ───
+  (function runListenBack() {
+    const overlay = document.getElementById('listenBack');
+    const wfEl = document.getElementById('lbWaveform');
+    const scanLine = document.getElementById('lbScanLine');
+    const handoff = document.getElementById('lbHandoff');
+    const status = document.getElementById('lbStatus');
+
+    if (!overlay || !wfEl) return;
+
+    // Build waveform bars
+    const barCount = 200;
+    let html = '';
+    const heights = [];
+    for (let i = 0; i < barCount; i++) {
+      const seed = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+      const noise = Math.abs(seed - Math.floor(seed));
+      // Vary the envelope so it feels like real audio shape
+      const envelope = Math.sin((i / barCount) * Math.PI * 1.4) * 0.6 + 0.4;
+      const height = (12 + noise * 80) * envelope;
+      heights.push(height);
+      html += `<div class="lb-bar" data-i="${i}" style="height:${height}px"></div>`;
+    }
+    // Insert bars AFTER the scan line so scan line stays as overlay
+    wfEl.insertAdjacentHTML('beforeend', html);
+    const bars = wfEl.querySelectorAll('.lb-bar');
+
+    // Reveal bars in a quick cascade (over ~780ms total)
+    bars.forEach((bar, i) => {
+      const delay = 260 + (i / barCount) * 780;
+      setTimeout(() => bar.classList.add('revealed'), delay);
+    });
+
+    // Start scan line at ~1.17s, animate left → right over the remaining ~3.9s
+    setTimeout(() => {
+      scanLine.classList.add('active');
+      scanLine.style.left = '100%';
+
+      // Mark bars as "scanning" as the line passes them
+      bars.forEach((bar, i) => {
+        const pct = (i / barCount) * 100;
+        const delay = (pct / 100) * 3900; // 3.9s sweep
+        setTimeout(() => {
+          bar.classList.add('scanning');
+          // After a short moment, return to normal but darker (analyzed)
+          setTimeout(() => {
+            bar.classList.remove('scanning');
+            bar.style.background = 'var(--ink-2)';
+          }, 325);
+        }, delay);
+      });
+    }, 1170);
+
+    // Status text rotation
+    const statuses = [
+      { at: 1040,  text: 'Listening back to <span class="ts-num">1h 47m</span>...' },
+      { at: 2080, text: 'Found the moment things got interesting — <span class="ts-num">12:08</span>.' },
+      { at: 3120, text: 'Marking <span class="ts-num">6</span> strong clips.' },
+      { at: 4030, text: 'Drafting an episode arc.' },
+    ];
+
+    statuses.forEach((s, idx) => {
+      setTimeout(() => {
+        status.classList.remove('visible');
+        setTimeout(() => {
+          status.innerHTML = s.text;
+          status.classList.add('visible');
+        }, 260);
+      }, s.at);
+    });
+
+    // Fade handoff after first status appears
+    setTimeout(() => {
+      handoff.style.transition = 'opacity 0.4s ease';
+      handoff.style.opacity = '0.3';
+    }, 910);
+
+    // Fade out the overlay at 5.2s
+    setTimeout(() => {
+      overlay.classList.add('fade-out');
+      document.body.classList.remove('lb-active');
+    }, 5200);
+
+    // Fully remove from layout after fade completes
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 6000);
+  })();
+
+
+  // Waveform
+  const wf = document.getElementById('waveform');
+  const markers = document.getElementById('markers');
+  const scrubber = document.getElementById('scrubber');
+  const playhead = scrubber ? scrubber.querySelector('.playhead') : null;
+
+  const PLAYHEAD_PCT = 4;
+
+  if (wf) {
+    const barCount = 160;
+    // Peaks aligned with clip timestamps:
+    // Clip 1 (Hook): 12:08 → ~12.6% of 1h36 → bar ~20
+    // Clip 2 (Quotable): 38:22 → ~39.9% → bar ~64
+    // Clip 3 (Peak ★): 47:12 → ~49.2% → bar ~79
+    const peakRegions = {
+      hook:    { bars: [19, 20, 21, 22], data: 'hook' },
+      quotable:{ bars: [62, 63, 64, 65], data: 'quotable' },
+      peak:    { bars: [77, 78, 79, 80, 81], data: 'peak' },
+    };
+    const peakBars = new Set([
+      ...peakRegions.hook.bars,
+      ...peakRegions.quotable.bars,
+      ...peakRegions.peak.bars,
+    ]);
+    function peakDataFor(i) {
+      if (peakRegions.hook.bars.includes(i)) return 'hook';
+      if (peakRegions.quotable.bars.includes(i)) return 'quotable';
+      if (peakRegions.peak.bars.includes(i)) return 'peak';
+      return null;
+    }
+
+    const highlights = new Set();
+    // Strong thread: minute 23 → 71 of 96 min → 24% → 74%
+    for (let i = 38; i <= 118; i++) highlights.add(i);
+
+    let html = '';
+    for (let i = 0; i < barCount; i++) {
+      const seed = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+      const noise = Math.abs(seed - Math.floor(seed));
+      let height = 6 + noise * 42;
+      if (highlights.has(i)) height = 10 + noise * 48;
+      if (peakBars.has(i)) height = Math.max(height, 56);
+
+      let cls = 'wf-bar';
+      let dataAttr = '';
+      const peakKey = peakDataFor(i);
+      if (peakKey) {
+        cls += ' peak';
+        dataAttr = ` data-peak="${peakKey}"`;
+      } else if (highlights.has(i)) {
+        cls += ' highlight';
+      }
+
+      const pctOfBar = (i / barCount) * 100;
+      if (pctOfBar < PLAYHEAD_PCT && !peakBars.has(i) && !highlights.has(i)) {
+        cls += ' played';
+      }
+
+      html += `<div class="${cls}"${dataAttr} style="height:${height}px"></div>`;
+    }
+    wf.innerHTML = html;
+  }
+  if (playhead) playhead.style.left = PLAYHEAD_PCT + '%';
+
+  if (markers) {
+    const data = [
+      { pos: 4, label: 'Ch. 1', star: false },
+      { pos: 12.6, label: '0:42 clip', star: false },
+      { pos: 22, label: 'Ch. 2', star: false },
+      { pos: 39.9, label: '1:08 clip', star: false },
+      { pos: 49.2, label: '★ 0:55 clip', star: true },
+      { pos: 62, label: 'Ch. 3', star: false },
+      { pos: 84, label: 'Ch. 4', star: false },
+    ];
+    let html = '';
+    data.forEach(m => {
+      html += `
+        <div class="wf-marker" style="left:${m.pos}%">
+          <div class="wf-marker-label ${m.star ? 'star' : ''}">${m.label}</div>
+          <div class="wf-marker-line ${m.star ? 'star' : ''}"></div>
+        </div>
+      `;
+    });
+    markers.innerHTML = html;
+  }
+
+  // Edit marks — show each cut on the scrubber as a small dot
+  const editMarks = document.getElementById('editMarks');
+  if (editMarks) {
+    const edits = [
+      { pos: 2.5, label: 'Cut 0:00–4:12 · false start' },
+      { pos: 9, label: 'Cut 38s · filler' },
+      { pos: 17, label: 'Cut 1m 12s · tangent' },
+      { pos: 24, label: 'Cut 24s · cross-talk' },
+      { pos: 31, label: 'Cut 18s · filler' },
+      { pos: 38, label: 'Cut 45s · pause' },
+      { pos: 46, label: 'Cut 1m 8s · repetition' },
+      { pos: 52, label: 'Cut 22s · filler' },
+      { pos: 60, label: 'Cut 1m 30s · tangent' },
+      { pos: 67, label: 'Cut 35s · cross-talk' },
+      { pos: 75, label: 'Cut 28s · filler' },
+      { pos: 82, label: 'Cut 50s · pause' },
+      { pos: 89, label: 'Cut 42s · repetition' },
+      { pos: 96, label: 'Cut 1m 6s · outro filler' },
+    ];
+    let html = '';
+    edits.forEach(e => {
+      html += `<div class="edit-mark" style="left:${e.pos}%" data-label="${e.label}"></div>`;
+    });
+    editMarks.innerHTML = html;
+  }
+
+  // Peak hover tooltip
+  const peakData = {
+    hook: {
+      label: 'Hook · 12:08',
+      quote: '"I was making more money than my parents combined and I cried in the bathroom every Tuesday."',
+    },
+    quotable: {
+      label: 'Quotable · 38:22',
+      quote: '"Three rules for knowing it\'s time to leave a job that\'s just fine."',
+    },
+    peak: {
+      label: 'Emotional peak · 47:12',
+      quote: '"I didn\'t know it was the last time we\'d build something together."',
+    },
+  };
+
+  // Create tooltip element
+  const tooltip = document.createElement('div');
+  tooltip.className = 'peak-tooltip';
+  tooltip.innerHTML = `
+    <div class="peak-tooltip-label"></div>
+    <div class="peak-tooltip-quote"></div>
+  `;
+  document.body.appendChild(tooltip);
+
+  // Attach hover handlers to all peak bars
+  document.querySelectorAll('.wf-bar.peak').forEach(bar => {
+    bar.addEventListener('mouseenter', (e) => {
+      const key = bar.dataset.peak;
+      const d = peakData[key];
+      if (!d) return;
+      tooltip.querySelector('.peak-tooltip-label').textContent = d.label;
+      tooltip.querySelector('.peak-tooltip-quote').textContent = d.quote;
+      const rect = bar.getBoundingClientRect();
+      tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+      tooltip.style.top = (rect.top + window.scrollY) + 'px';
+      tooltip.classList.add('visible');
+    });
+    bar.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+  });
+
+  // Menu popup (ellipsis next to Publish)
+  const menuBtn = document.getElementById('menuBtn');
+  const menuPopup = document.getElementById('menuPopup');
+  if (menuBtn && menuPopup) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menuPopup.classList.toggle('open');
+      menuBtn.classList.toggle('open', isOpen);
+    });
+    document.addEventListener('click', (e) => {
+      if (!menuPopup.contains(e.target) && e.target !== menuBtn) {
+        menuPopup.classList.remove('open');
+        menuBtn.classList.remove('open');
+      }
+    });
+  }
+
+  // Edits side panel toggle
+  const editsLink = document.getElementById('editsLink');
+  const editsPanel = document.getElementById('editsPanel');
+  const editsScrim = document.getElementById('editsScrim');
+  const editsClose = document.getElementById('editsClose');
+
+  function openEditsPanel() {
+    if (editsPanel) editsPanel.classList.add('open');
+    if (editsScrim) editsScrim.classList.add('open');
+  }
+  function closeEditsPanel() {
+    if (editsPanel) editsPanel.classList.remove('open');
+    if (editsScrim) editsScrim.classList.remove('open');
+  }
+  if (editsLink) editsLink.addEventListener('click', (e) => { e.preventDefault(); openEditsPanel(); });
+  if (editsClose) editsClose.addEventListener('click', closeEditsPanel);
+  if (editsScrim) editsScrim.addEventListener('click', closeEditsPanel);
+
+  // Edit category filter chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const filter = chip.dataset.filter;
+      document.querySelectorAll('.edit-row').forEach(row => {
+        if (filter === 'all' || row.dataset.category === filter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // ─── PUBLISH / SHARE MODAL ───
+  const publishScrim = document.getElementById('publishScrim');
+  const publishModal = document.getElementById('publishModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSubtitle = document.getElementById('modalSubtitle');
+  const modalConfirmText = document.getElementById('modalConfirmText');
+  const destCount = document.getElementById('destCount');
+  const episodeSection = document.getElementById('episodeSection');
+  const clipSection = document.getElementById('clipSection');
+  const clipSectionLabel = document.getElementById('clipSectionLabel');
+
+  function updateDestCount() {
+    const visibleToggles = document.querySelectorAll('.modal-section:not(.hidden) .toggle.on');
+    const count = visibleToggles.length;
+    if (destCount) {
+      destCount.textContent = count + (count === 1 ? ' destination' : ' destinations');
+    }
+  }
+
+  function openModal(mode, options) {
+    options = options || {};
+    if (mode === 'episode') {
+      // Full publish flow
+      modalTitle.textContent = 'Publish your episode';
+      modalSubtitle.innerHTML = '<span>1h 36m episode</span><span class="sep">·</span><span>3 clips</span><span class="sep">·</span><span>3 promo posts</span>';
+      modalConfirmText.textContent = 'Publish episode';
+      episodeSection.classList.remove('hidden');
+      clipSection.classList.remove('hidden');
+    } else if (mode === 'share-all') {
+      modalTitle.textContent = 'Share your clips';
+      modalSubtitle.innerHTML = '<span>3 clips selected</span><span class="sep">·</span><span>strongest of 6</span>';
+      modalConfirmText.textContent = 'Share clips';
+      episodeSection.classList.add('hidden');
+      clipSection.classList.remove('hidden');
+      if (clipSectionLabel) clipSectionLabel.textContent = 'Share to';
+    } else if (mode === 'share-one') {
+      modalTitle.textContent = 'Share this clip';
+      modalSubtitle.innerHTML = '<span>' + (options.clipName || 'Clip') + '</span><span class="sep">·</span><span>' + (options.duration || '') + '</span>';
+      modalConfirmText.textContent = 'Share clip';
+      episodeSection.classList.add('hidden');
+      clipSection.classList.remove('hidden');
+      if (clipSectionLabel) clipSectionLabel.textContent = 'Share to';
+    }
+    updateDestCount();
+    publishScrim.classList.add('open');
+  }
+
+  function closeModal() {
+    publishScrim.classList.remove('open');
+  }
+
+  // Open from primary Publish button
+  const publishBtn = document.getElementById('publishBtn');
+  if (publishBtn) {
+    publishBtn.addEventListener('click', () => openModal('episode'));
+  }
+
+  // Open from Share all clips
+  const shareAllBtn = document.getElementById('shareAllBtn');
+  if (shareAllBtn) {
+    shareAllBtn.addEventListener('click', () => openModal('share-all'));
+  }
+
+  // Open from individual clip Share buttons
+  document.querySelectorAll('.clip-share').forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.clip-card');
+      const tag = card ? card.querySelector('.clip-tag-overlay') : null;
+      const duration = card ? card.querySelector('.clip-duration') : null;
+      openModal('share-one', {
+        clipName: tag ? tag.textContent + ' clip' : 'Clip',
+        duration: duration ? duration.textContent : '',
+      });
+    });
+  });
+
+  // Close handlers
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (publishScrim) {
+    publishScrim.addEventListener('click', (e) => {
+      if (e.target === publishScrim) closeModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && publishScrim && publishScrim.classList.contains('open')) {
+      closeModal();
+    }
+  });
+
+  // Toggle switches
+  document.querySelectorAll('.toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('on');
+      updateDestCount();
+    });
+  });
+
+  // Title selection — tracks which title is chosen and updates published state
+  let chosenTitle = '"I left Google to make something I could explain to my mom"';
+  document.querySelectorAll('.title-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.title-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      const titleText = option.querySelector('.title-text');
+      if (titleText) {
+        chosenTitle = titleText.textContent.trim();
+        // If the title is already quoted, leave as-is; otherwise add quotes
+        if (!chosenTitle.startsWith('"') && !chosenTitle.startsWith('\u201C')) {
+          chosenTitle = '"' + chosenTitle + '"';
+        }
+      }
+    });
+  });
+
+  // Timing radio
+  document.querySelectorAll('.timing-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.timing-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+    });
+  });
+
+  // ─── PUBLISH SEQUENCE ───
+  const modalConfirm = document.getElementById('modalConfirm');
+  const psEyebrowText = document.getElementById('psEyebrowText');
+  const psPct = document.getElementById('psPct');
+  const psFill = document.getElementById('psFill');
+  const psCounter = document.getElementById('psCounter');
+  const psTitle = document.getElementById('psTitle');
+  const psSub = document.getElementById('psSub');
+
+  function getSelectedTiming() {
+    const selected = document.querySelector('.timing-option.selected');
+    return selected ? selected.dataset.timing : 'now';
+  }
+
+  function startPublish() {
+    const timing = getSelectedTiming();
+    closeModal();
+    setTimeout(() => {
+      if (timing === 'now') {
+        // Full publish animation, then Live state
+        document.body.classList.add('publishing');
+        document.body.classList.remove('published');
+        document.body.classList.remove('mode-scheduled');
+        runPublishAnimation();
+      } else {
+        // Scheduled — skip animation, go straight to Scheduled state
+        document.body.classList.remove('publishing');
+        document.body.classList.add('published');
+        document.body.classList.add('mode-scheduled');
+        buildPublishedWaveform();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 300);
+  }
+
+  function runPublishAnimation() {
+    const destRows = document.querySelectorAll('#psDestList .ps-dest');
+    const total = destRows.length;
+    let completed = 0;
+
+    // Reset all rows to initial state
+    destRows.forEach(row => {
+      row.classList.remove('uploading', 'processing', 'published');
+      const status = row.querySelector('.ps-dest-status');
+      if (status) status.textContent = 'Queued';
+    });
+    psPct.textContent = '0%';
+    psFill.style.width = '0%';
+    psCounter.textContent = `0 / ${total} complete`;
+    psEyebrowText.textContent = `Publishing · 0 of ${total} destinations`;
+    psTitle.innerHTML = 'Sending your episode <em>out into the world.</em>';
+    psSub.textContent = "You can leave this page — we'll let you know when it's live on each platform.";
+
+    // Stage 1: start uploading (staggered)
+    destRows.forEach((row, i) => {
+      const duration = parseInt(row.dataset.duration, 10);
+      const status = row.querySelector('.ps-dest-status');
+
+      // Start uploading staggered by ~150ms each
+      setTimeout(() => {
+        row.classList.add('uploading');
+        if (status) {
+          if (row.dataset.dest === 'youtube') {
+            status.textContent = 'Uploading video · 1h 36m';
+          } else if (row.dataset.dest === 'rss' || row.dataset.dest === 'apple' || row.dataset.dest === 'spotify') {
+            status.textContent = 'Uploading audio';
+          } else {
+            status.textContent = 'Scheduling 3 clips';
+          }
+        }
+      }, i * 150);
+
+      // Transition to processing midway
+      setTimeout(() => {
+        row.classList.remove('uploading');
+        row.classList.add('processing');
+        if (status) {
+          if (row.dataset.dest === 'youtube') {
+            status.textContent = 'Processing for streaming';
+          } else if (row.dataset.dest === 'rss') {
+            status.textContent = 'Pushing to feed';
+          } else if (row.dataset.dest === 'apple' || row.dataset.dest === 'spotify') {
+            status.textContent = 'Finalizing on platform';
+          } else {
+            status.textContent = 'Sending to platform';
+          }
+        }
+      }, i * 150 + duration * 0.6);
+
+      // Complete
+      setTimeout(() => {
+        row.classList.remove('uploading', 'processing');
+        row.classList.add('published');
+        if (status) {
+          if (row.dataset.dest === 'instagram' || row.dataset.dest === 'tiktok' || row.dataset.dest === 'x') {
+            status.textContent = 'Scheduled · Tue 9:00 AM';
+          } else {
+            status.textContent = 'Live';
+          }
+        }
+        completed++;
+        const pct = Math.round((completed / total) * 100);
+        psPct.textContent = pct + '%';
+        psFill.style.width = pct + '%';
+        psCounter.textContent = `${completed} / ${total} complete`;
+        psEyebrowText.textContent = `Publishing · ${completed} of ${total} destinations`;
+
+        // All done → transition to "Published" state
+        if (completed === total) {
+          setTimeout(() => {
+            document.body.classList.remove('publishing');
+            document.body.classList.add('published');
+            buildPublishedWaveform();
+          }, 800);
+        }
+      }, i * 150 + duration);
+    });
+  }
+
+  if (modalConfirm) {
+    modalConfirm.addEventListener('click', startPublish);
+  }
+
+  // Build the Published-state waveform with ripples at clip peaks
+  function buildPublishedWaveform() {
+    // Update the chosen title element from the user's selection
+    const plChosenTitle = document.getElementById('plChosenTitle');
+    if (plChosenTitle) plChosenTitle.textContent = chosenTitle;
+
+    const wf = document.getElementById('plWaveform');
+    const markers = document.getElementById('plMarkers');
+    if (!wf) return;
+
+    // Clear existing
+    wf.innerHTML = '';
+    if (markers) markers.innerHTML = '';
+
+    const barCount = 200;
+    // Peak positions (matching the player scrubber):
+    // hook ~bars 24-26, quotable ~78-80, peak ★ ~97-99
+    const peakRegions = {
+      hook:     { bars: [24, 25, 26], pct: 12.6 },
+      quotable: { bars: [78, 79, 80], pct: 39.9 },
+      peak:     { bars: [97, 98, 99], pct: 49.2 },
+    };
+    const peakBars = new Set([
+      ...peakRegions.hook.bars,
+      ...peakRegions.quotable.bars,
+      ...peakRegions.peak.bars,
+    ]);
+    const highlights = new Set();
+    for (let i = 48; i <= 148; i++) highlights.add(i);
+
+    let html = '';
+    const heights = [];
+    for (let i = 0; i < barCount; i++) {
+      const seed = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+      const noise = Math.abs(seed - Math.floor(seed));
+      const envelope = Math.sin((i / barCount) * Math.PI * 1.3) * 0.55 + 0.45;
+      let height = (8 + noise * 50) * envelope;
+      if (highlights.has(i)) height = (12 + noise * 60) * envelope;
+      if (peakBars.has(i)) height = Math.max(height, 70);
+      heights.push(height);
+
+      let cls = 'pl-wf-bar';
+      if (peakBars.has(i)) cls += ' peak';
+      else if (highlights.has(i)) cls += ' highlight';
+
+      html += `<div class="${cls}" style="height:${height}px"></div>`;
+    }
+
+    // Add ripple emitters at the peak positions
+    Object.values(peakRegions).forEach(region => {
+      html += `<div class="pl-ripple" style="left:${region.pct}%"></div>`;
+    });
+
+    wf.innerHTML = html;
+
+    // Reveal bars cascade
+    const bars = wf.querySelectorAll('.pl-wf-bar');
+    bars.forEach((bar, i) => {
+      const delay = (i / barCount) * 600;
+      setTimeout(() => bar.classList.add('revealed'), delay);
+    });
+
+    // Markers
+    if (markers) {
+      const data = [
+        { pos: 4, label: 'Ch. 1', star: false },
+        { pos: 12.6, label: 'Hook clip', star: false },
+        { pos: 22, label: 'Ch. 2', star: false },
+        { pos: 39.9, label: 'Quotable clip', star: false },
+        { pos: 49.2, label: '★ Peak clip', star: true },
+        { pos: 62, label: 'Ch. 3', star: false },
+        { pos: 84, label: 'Ch. 4', star: false },
+      ];
+      let markersHtml = '';
+      data.forEach(m => {
+        markersHtml += `
+          <div class="pl-wf-marker" style="left:${m.pos}%">
+            <div class="pl-wf-marker-label ${m.star ? 'star' : ''}">${m.label}</div>
+            <div class="pl-wf-marker-line ${m.star ? 'star' : ''}"></div>
+          </div>
+        `;
+      });
+      markers.innerHTML = markersHtml;
+    }
+  }
+
+  // Demo reset
+  const demoReset = document.getElementById('demoReset');
+  if (demoReset) {
+    demoReset.addEventListener('click', () => {
+      document.body.classList.remove('publishing', 'published', 'mode-scheduled');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ─── TITLE EDIT MODAL ───
+  const teScrim = document.getElementById('teScrim');
+  const teClose = document.getElementById('teClose');
+  const teCancel = document.getElementById('teCancel');
+  const teSave = document.getElementById('teSave');
+  const teCustom = document.getElementById('teCustom');
+  const teOptions = document.querySelectorAll('#teOptions .te-option');
+  const plTitleEdit = document.getElementById('plTitleEdit');
+  const plChosenTitle = document.getElementById('plChosenTitle');
+
+  function openTitleEdit() {
+    if (!teScrim) return;
+    // Pre-select the currently-chosen title if it matches an option
+    let matched = false;
+    teOptions.forEach(opt => {
+      opt.classList.remove('selected');
+      const optTitle = opt.dataset.title;
+      // Compare by trimmed text content
+      if (optTitle && (optTitle === chosenTitle || ('"' + optTitle + '"') === chosenTitle)) {
+        opt.classList.add('selected');
+        matched = true;
+      }
+    });
+    if (!matched) {
+      // It's a custom title — populate the custom field
+      if (teCustom) {
+        teCustom.value = chosenTitle.replace(/^["“]|["”]$/g, '');
+      }
+    } else {
+      if (teCustom) teCustom.value = '';
+    }
+    teScrim.classList.add('open');
+  }
+  function closeTitleEdit() {
+    if (teScrim) teScrim.classList.remove('open');
+  }
+
+  if (plTitleEdit) plTitleEdit.addEventListener('click', openTitleEdit);
+  if (teClose) teClose.addEventListener('click', closeTitleEdit);
+  if (teCancel) teCancel.addEventListener('click', closeTitleEdit);
+  if (teScrim) {
+    teScrim.addEventListener('click', (e) => {
+      if (e.target === teScrim) closeTitleEdit();
+    });
+  }
+
+  // Selection: clicking an option clears custom field; typing in custom clears selection
+  teOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      teOptions.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      if (teCustom) teCustom.value = '';
+    });
+  });
+  if (teCustom) {
+    teCustom.addEventListener('input', () => {
+      if (teCustom.value.trim().length > 0) {
+        teOptions.forEach(o => o.classList.remove('selected'));
+      }
+    });
+  }
+
+  // Save → update the chosen title in the hero
+  if (teSave) {
+    teSave.addEventListener('click', () => {
+      let newTitle = '';
+      const customVal = teCustom ? teCustom.value.trim() : '';
+      if (customVal.length > 0) {
+        // Wrap in quotes if not already
+        newTitle = (customVal.startsWith('"') || customVal.startsWith('\u201C'))
+          ? customVal
+          : '"' + customVal + '"';
+      } else {
+        const selectedOpt = document.querySelector('#teOptions .te-option.selected');
+        if (selectedOpt) {
+          newTitle = selectedOpt.dataset.title;
+          if (!newTitle.startsWith('"') && !newTitle.startsWith('\u201C')) {
+            newTitle = '"' + newTitle + '"';
+          }
+        }
+      }
+      if (newTitle) {
+        chosenTitle = newTitle;
+        if (plChosenTitle) plChosenTitle.textContent = chosenTitle;
+      }
+      closeTitleEdit();
+    });
+  }
+
+  // ESC closes title edit if it's open
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && teScrim && teScrim.classList.contains('open')) {
+      closeTitleEdit();
+    }
+  });
+</script>
+
+</body>
+</html>
