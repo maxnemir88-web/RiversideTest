@@ -5,11 +5,12 @@
 <title>Content Launchpad — Riverside</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@300..600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0E0E0C;
-    --sidebar-bg: #0A0A09;
+    --bg: #050504;
+    --sidebar-bg: #050504;
+    --card-bg: #0E0E0C;
     --surface-1: #1A1916;
     --surface-2: #21201C;
     --line: #2A2823;
@@ -26,9 +27,20 @@
 
     --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --mono: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
     --sidebar-w: 80px;
+    --gutter: 14px;
+
+    /* Type scale */
+    --t-xs: 11px;
+    --t-sm: 13px;
+    --t-base: 15px;
+    --t-lg: 17px;
+    --t-xl: 20px;
+    --t-2xl: 26px;
+    --t-3xl: 32px;
+    --t-4xl: 40px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,12 +66,71 @@
 
   ::selection { background: var(--accent); color: var(--bg); }
 
+  /* Inter is doing label work now (where mono used to). Bump weight and tighten
+     tracking on the common label sizes so they keep their "system tag" feel. */
+  .eyebrow,
+  .ps-eyebrow,
+  .pl-eyebrow,
+  .proof-label,
+  .stat-label,
+  .titles-label,
+  .section-meta,
+  .clip-tag-overlay,
+  .clip-duration,
+  .clip-reason-label,
+  .wf-marker-label,
+  .pl-wf-marker-label,
+  .promo-channel,
+  .asset-count,
+  .filter-chip .filter-count,
+  .edit-category,
+  .edit-timestamp,
+  .modal-section-label,
+  .meta-tag,
+  .pl-dest-state,
+  .ps-overall-label,
+  .ps-right-title,
+  .ps-right-counter,
+  .ps-next-label,
+  .te-option-tag,
+  .te-custom-label,
+  .clip-status-badge,
+  .edited-badge,
+  .name-tag,
+  .preview-label,
+  .play-context,
+  .transport-action,
+  .transport-speed,
+  .ai-note-link,
+  .refine-link,
+  .nav-label,
+  .format-pill {
+    font-weight: 500;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  /* Tabular figures wherever numbers are tracked */
+  .ai-note .timestamp,
+  .ts-num,
+  .ts,
+  .stat-value,
+  .proof-value,
+  .clip-duration,
+  .transport-time,
+  .wf-timeline span,
+  .scrubber-timeline span,
+  .pl-wf-timeline span,
+  .edit-duration,
+  .pl-meta,
+  .session-meta {
+    font-feature-settings: "tnum";
+  }
+
   /* ─────── SIDEBAR ─────── */
   .sidebar {
     width: var(--sidebar-w);
     flex-shrink: 0;
     background: var(--sidebar-bg);
-    border-right: 1px solid var(--line-soft);
     height: 100vh;
     position: sticky;
     top: 0;
@@ -134,7 +205,7 @@
     stroke-width: 1.6;
   }
   .nav-label {
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     font-weight: 500;
     letter-spacing: 0.01em;
     text-align: center;
@@ -157,37 +228,54 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--ink);
     font-weight: 500;
     cursor: pointer;
   }
 
-  /* ─────── MAIN ─────── */
+  /* ─────── MAIN (shell with gutter + card) ─────── */
   .main {
     flex: 1;
     min-width: 0;
+    height: 100vh;
+    padding: var(--gutter);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
   }
 
-  /* Top bar inside main */
-  .topbar {
+  /* Shell top — breadcrumbs on the left, action cluster on the right, sits in the top gutter */
+  .shell-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 40px;
-    border-bottom: 1px solid var(--line-soft);
-    position: sticky;
-    top: 0;
-    background: rgba(14, 14, 12, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    z-index: 40;
+    padding: 4px 8px;
+    margin-bottom: var(--gutter);
+    flex-shrink: 0;
+    min-height: 40px;
+    gap: 16px;
+  }
+
+  /* The card — pure content, no internal topbar */
+  .workspace-card {
+    flex: 1;
+    min-height: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--line-soft);
+    border-radius: 14px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+    position: relative;
   }
   .breadcrumbs {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
+    font-size: var(--t-base);
   }
   .crumb {
     color: var(--ink-3);
@@ -201,7 +289,7 @@
   }
   .crumb-sep {
     color: var(--ink-4);
-    font-size: 12px;
+    font-size: var(--t-sm);
     display: flex;
   }
   .crumb-sep svg { width: 14px; height: 14px; }
@@ -263,7 +351,7 @@
 
   .topbar-publish-btn {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -384,7 +472,7 @@
     left: 14px;
     z-index: 3;
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink);
@@ -410,7 +498,7 @@
     padding: 7px 12px;
     border-radius: 100px;
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -533,7 +621,7 @@
   }
   .wf-marker-label {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-3);
@@ -583,7 +671,7 @@
     padding: 10px 14px;
     border-radius: 8px;
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     color: var(--ink);
     white-space: nowrap;
     z-index: 30;
@@ -598,7 +686,7 @@
   .peak-tooltip .peak-tooltip-label {
     color: var(--accent);
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 4px;
@@ -606,7 +694,7 @@
   .peak-tooltip .peak-tooltip-quote {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-2);
     max-width: 280px;
     white-space: normal;
@@ -637,7 +725,7 @@
     justify-content: space-between;
     margin-top: 8px;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-4);
     letter-spacing: 0.04em;
   }
@@ -645,7 +733,7 @@
   /* Right side of transport: speed */
   .transport-speed {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     letter-spacing: 0.04em;
     color: var(--ink-3);
     background: transparent;
@@ -671,7 +759,7 @@
   .hero-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 42px;
+    font-size: var(--t-4xl);
     line-height: 1.1;
     letter-spacing: -0.028em;
     color: var(--ink);
@@ -684,7 +772,7 @@
 
   .hero-sub {
     font-family: var(--sans);
-    font-size: 15px;
+    font-size: var(--t-base);
     line-height: 1.65;
     color: var(--ink-3);
     max-width: 480px;
@@ -712,7 +800,7 @@
   .proof-cell.highlight { background: var(--accent-glow); }
   .proof-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-3);
@@ -721,7 +809,7 @@
   .proof-value {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: var(--t-xl);
     color: var(--ink);
     letter-spacing: -0.02em;
     line-height: 1;
@@ -732,7 +820,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-weight: 300;
-    font-size: 15px;
+    font-size: var(--t-base);
     line-height: 1.55;
     color: var(--ink-2);
     padding: 4px 0 4px 16px;
@@ -741,7 +829,7 @@
   .ai-note .timestamp {
     font-family: var(--mono);
     font-style: normal;
-    font-size: 11.5px;
+    font-size: var(--t-xs);
     color: var(--accent);
     letter-spacing: 0.04em;
     white-space: nowrap;
@@ -751,7 +839,7 @@
     margin-top: 8px;
     font-family: var(--mono);
     font-style: normal;
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -797,7 +885,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: var(--t-xs);
     color: var(--accent);
     background: var(--surface-1);
     border: 1px solid var(--line);
@@ -822,7 +910,7 @@
   }
   .btn {
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: var(--t-base);
     font-weight: 500;
     padding: 16px 22px;
     border-radius: 10px;
@@ -905,7 +993,7 @@
     padding: 10px 12px;
     border-radius: 6px;
     color: var(--ink-2);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     cursor: pointer;
     transition: all 0.15s;
     text-decoration: none;
@@ -935,20 +1023,20 @@
   .section-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 30px;
+    font-size: var(--t-3xl);
     letter-spacing: -0.02em;
     color: var(--ink);
   }
   .section-sub {
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: var(--t-base);
     color: var(--ink-3);
     max-width: 580px;
     line-height: 1.5;
   }
   .section-meta {
     font-family: var(--mono);
-    font-size: 11.5px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -963,7 +1051,7 @@
   }
   .section-btn-ghost {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     font-weight: 500;
     color: var(--ink-2);
     background: transparent;
@@ -983,7 +1071,7 @@
   }
   .section-btn-primary {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -1027,7 +1115,7 @@
   }
   .title-tag {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -1036,7 +1124,7 @@
   .title-text {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 16.5px;
+    font-size: var(--t-lg);
     line-height: 1.35;
     color: var(--ink);
     letter-spacing: -0.01em;
@@ -1114,7 +1202,7 @@
     right: 16px;
     font-family: var(--sans);
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--t-base);
     line-height: 1.35;
     color: var(--ink);
     z-index: 2;
@@ -1132,7 +1220,7 @@
     top: 12px;
     right: 12px;
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     background: rgba(0, 0, 0, 0.7);
     padding: 4px 8px;
     border-radius: 4px;
@@ -1145,7 +1233,7 @@
     top: 12px;
     left: 12px;
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--bg);
@@ -1164,7 +1252,7 @@
   }
   .clip-reason-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-3);
@@ -1172,7 +1260,7 @@
   .clip-reason {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 14.5px;
+    font-size: var(--t-base);
     line-height: 1.5;
     color: var(--ink-2);
     letter-spacing: -0.005em;
@@ -1181,7 +1269,7 @@
   .clip-reason .ts {
     font-family: var(--mono);
     font-style: normal;
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--accent);
     letter-spacing: 0.04em;
   }
@@ -1195,7 +1283,7 @@
   .clip-share {
     flex: 1;
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     font-weight: 500;
     color: var(--ink);
     background: var(--surface-2);
@@ -1217,7 +1305,7 @@
   .clip-share svg { width: 13px; height: 13px; }
   .clip-edit {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: 1px solid var(--line);
@@ -1236,7 +1324,7 @@
   .clip-edit svg { width: 13px; height: 13px; }
   .format-pill {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-3);
@@ -1254,7 +1342,7 @@
   }
   .clip-action {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     color: var(--ink-2);
     display: flex;
     align-items: center;
@@ -1274,7 +1362,7 @@
   }
   .show-more {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-2);
     display: flex;
     align-items: center;
@@ -1285,7 +1373,7 @@
   .show-more:hover { color: var(--ink); }
   .refine-link {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--accent);
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -1333,14 +1421,14 @@
   }
   .promo-channel {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
   .promo-name {
     font-family: var(--serif);
-    font-size: 18px;
+    font-size: var(--t-xl);
     color: var(--ink);
     letter-spacing: -0.01em;
     line-height: 1.3;
@@ -1348,7 +1436,7 @@
   .promo-preview {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     line-height: 1.5;
     color: var(--ink-3);
     flex: 1;
@@ -1364,7 +1452,7 @@
   }
   .promo-primary {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     font-weight: 500;
     color: var(--ink);
     display: flex;
@@ -1377,7 +1465,7 @@
   .promo-primary:hover { color: var(--accent); }
   .promo-secondary {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     cursor: pointer;
     transition: color 0.2s;
@@ -1395,7 +1483,7 @@
   .leverage-stat {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 15px;
+    font-size: var(--t-base);
     color: var(--ink-2);
   }
   .leverage-stat strong {
@@ -1440,7 +1528,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-weight: 300;
-    font-size: 17px;
+    font-size: var(--t-lg);
     width: 100%;
     letter-spacing: -0.005em;
   }
@@ -1450,7 +1538,7 @@
   }
   .redirect-submit {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink-3);
@@ -1510,7 +1598,7 @@
     align-items: center;
     justify-content: center;
     font-family: var(--serif);
-    font-size: 18px;
+    font-size: var(--t-xl);
     color: var(--ink-2);
     opacity: 0;
     animation: lbFadeIn 0.6s ease forwards;
@@ -1520,7 +1608,7 @@
     font-family: var(--serif);
     font-weight: 300;
     font-style: italic;
-    font-size: 22px;
+    font-size: var(--t-xl);
     color: var(--ink-2);
     letter-spacing: -0.01em;
     opacity: 0;
@@ -1582,7 +1670,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-weight: 300;
-    font-size: 19px;
+    font-size: var(--t-xl);
     color: var(--ink-2);
     letter-spacing: -0.01em;
     opacity: 0;
@@ -1597,7 +1685,7 @@
     color: var(--accent);
     font-family: var(--mono);
     font-style: normal;
-    font-size: 16px;
+    font-size: var(--t-lg);
     letter-spacing: 0;
   }
 
@@ -1663,14 +1751,14 @@
   .modal-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 26px;
+    font-size: var(--t-2xl);
     letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1.1;
   }
   .modal-subtitle {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
   }
   .modal-subtitle .sep { color: var(--ink-4); margin: 0 8px; }
@@ -1706,7 +1794,7 @@
 
   .modal-section-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--ink-3);
@@ -1738,7 +1826,7 @@
   .dest-info { flex: 1; min-width: 0; }
   .dest-name {
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: var(--t-base);
     color: var(--ink);
     font-weight: 500;
     display: flex;
@@ -1747,13 +1835,13 @@
   }
   .dest-meta {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     margin-top: 3px;
   }
   .dest-meta .meta-tag {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     background: var(--surface-2);
     border: 1px solid var(--line);
@@ -1838,20 +1926,20 @@
   .timing-content { flex: 1; }
   .timing-label {
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: var(--t-base);
     color: var(--ink);
     font-weight: 500;
   }
   .timing-detail {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     margin-top: 3px;
   }
   .timing-detail .smart-tag {
     color: var(--accent);
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     margin-right: 6px;
@@ -1870,7 +1958,7 @@
   }
   .modal-footer-left {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
   }
   .modal-footer-left strong {
@@ -1884,7 +1972,7 @@
   }
   .modal-btn-secondary {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: none;
@@ -1895,7 +1983,7 @@
   .modal-btn-secondary:hover { color: var(--ink); }
   .modal-btn-primary {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -1970,7 +2058,7 @@
     align-items: center;
     gap: 10px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -2003,7 +2091,7 @@
   .ps-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 38px;
+    font-size: var(--t-4xl);
     line-height: 1.12;
     letter-spacing: -0.025em;
     color: var(--ink);
@@ -2015,7 +2103,7 @@
 
   .ps-sub {
     font-family: var(--sans);
-    font-size: 14.5px;
+    font-size: var(--t-base);
     line-height: 1.6;
     color: var(--ink-3);
     max-width: 460px;
@@ -2038,14 +2126,14 @@
   }
   .ps-overall-label {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .ps-overall-pct {
     font-family: var(--serif);
-    font-size: 22px;
+    font-size: var(--t-2xl);
     color: var(--accent);
     letter-spacing: -0.02em;
   }
@@ -2081,14 +2169,14 @@
 
   .ps-next-label {
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-3);
   }
   .ps-next-title {
     font-family: var(--serif);
-    font-size: 22px;
+    font-size: var(--t-2xl);
     line-height: 1.25;
     color: var(--ink);
     letter-spacing: -0.02em;
@@ -2100,7 +2188,7 @@
   }
   .ps-next-primary {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: var(--ink);
     background: var(--surface-2);
@@ -2121,7 +2209,7 @@
   .ps-next-primary svg { width: 13px; height: 13px; }
   .ps-next-secondary {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: none;
@@ -2147,14 +2235,14 @@
   }
   .ps-right-title {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
   .ps-right-counter {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--accent);
     letter-spacing: 0.04em;
   }
@@ -2196,13 +2284,13 @@
   .ps-dest-info { flex: 1; min-width: 0; }
   .ps-dest-name {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     color: var(--ink);
     font-weight: 500;
   }
   .ps-dest-status {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     margin-top: 3px;
     transition: color 0.3s;
@@ -2251,7 +2339,7 @@
   /* View link shown in published rows after everything completes */
   .ps-dest-view {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     color: var(--accent);
     text-decoration: none;
     margin-left: 10px;
@@ -2273,7 +2361,7 @@
     right: 24px;
     z-index: 95;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     background: var(--surface-1);
     border: 1px solid var(--line);
@@ -2349,7 +2437,7 @@
     border-radius: 8px;
     color: var(--ink-3);
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.18s;
@@ -2415,14 +2503,14 @@
   .te-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 22px;
+    font-size: var(--t-2xl);
     letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1.1;
   }
   .te-subtitle {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     line-height: 1.5;
   }
@@ -2475,7 +2563,7 @@
   }
   .te-option-tag {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -2484,7 +2572,7 @@
   .te-option-text {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 15.5px;
+    font-size: var(--t-base);
     line-height: 1.35;
     color: var(--ink);
     letter-spacing: -0.01em;
@@ -2492,7 +2580,7 @@
 
   .te-custom-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -2506,7 +2594,7 @@
     padding: 14px 18px;
     color: var(--ink);
     font-family: var(--serif);
-    font-size: 15.5px;
+    font-size: var(--t-base);
     line-height: 1.4;
     letter-spacing: -0.01em;
     outline: none;
@@ -2533,7 +2621,7 @@
   }
   .te-btn-secondary {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: none;
@@ -2544,7 +2632,7 @@
   .te-btn-secondary:hover { color: var(--ink); }
   .te-btn-primary {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -2604,7 +2692,7 @@
     align-items: center;
     gap: 10px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -2629,7 +2717,7 @@
   .pl-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 44px;
+    font-size: var(--t-4xl);
     line-height: 1.08;
     letter-spacing: -0.025em;
     color: var(--ink);
@@ -2651,7 +2739,7 @@
     font-family: var(--serif);
     font-style: italic;
     font-weight: 300;
-    font-size: 26px;
+    font-size: var(--t-2xl);
     line-height: 1.3;
     letter-spacing: -0.015em;
     color: var(--ink-2);
@@ -2698,7 +2786,7 @@
     padding: 5px 10px 5px 6px;
     border-radius: 100px;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--accent);
@@ -2759,7 +2847,7 @@
 
   .clip-view {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     font-weight: 500;
     color: var(--accent);
     background: transparent;
@@ -2790,7 +2878,7 @@
 
   .pl-meta {
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: var(--t-base);
     color: var(--ink-3);
     display: flex;
     align-items: center;
@@ -2845,7 +2933,7 @@
   }
   .pl-wf-marker-label {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-3);
@@ -2928,7 +3016,7 @@
     justify-content: space-between;
     margin-top: 12px;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-4);
     letter-spacing: 0.04em;
   }
@@ -2983,14 +3071,14 @@
   }
   .pl-dest-name {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     color: var(--ink);
     font-weight: 500;
     line-height: 1.2;
   }
   .pl-dest-state {
     font-family: var(--mono);
-    font-size: 9.5px;
+    font-size: var(--t-xs);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink-3);
@@ -3039,14 +3127,14 @@
   }
   .pl-next-label {
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-3);
   }
   .pl-next-title {
     font-family: var(--serif);
-    font-size: 22px;
+    font-size: var(--t-2xl);
     line-height: 1.25;
     color: var(--ink);
     letter-spacing: -0.02em;
@@ -3059,7 +3147,7 @@
   }
   .pl-next-primary {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -3080,7 +3168,7 @@
   .pl-next-primary svg { width: 13px; height: 13px; }
   .pl-next-secondary {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: none;
@@ -3148,14 +3236,14 @@
   .edits-title {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: 26px;
+    font-size: var(--t-2xl);
     letter-spacing: -0.02em;
     color: var(--ink);
     line-height: 1.1;
   }
   .edits-subtitle {
     font-family: var(--sans);
-    font-size: 13.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     line-height: 1.5;
   }
@@ -3184,7 +3272,7 @@
     align-items: center;
     gap: 8px;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: var(--t-xs);
     color: var(--accent);
     background: var(--accent-glow);
     border: 1px solid var(--accent-dim);
@@ -3205,7 +3293,7 @@
   }
   .filter-chip {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     font-weight: 500;
     color: var(--ink-3);
     background: transparent;
@@ -3230,7 +3318,7 @@
   }
   .filter-chip .filter-count {
     font-family: var(--mono);
-    font-size: 10.5px;
+    font-size: var(--t-xs);
     color: var(--ink-4);
   }
   .filter-chip.active .filter-count { color: var(--ink-3); }
@@ -3259,7 +3347,7 @@
   }
   .edit-timestamp {
     font-family: var(--mono);
-    font-size: 11.5px;
+    font-size: var(--t-xs);
     color: var(--ink-2);
     background: var(--surface-1);
     border: 1px solid var(--line);
@@ -3269,7 +3357,7 @@
   }
   .edit-category {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: var(--t-xs);
     color: var(--ink-3);
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -3277,7 +3365,7 @@
   .edit-duration {
     margin-left: auto;
     font-family: var(--serif);
-    font-size: 16px;
+    font-size: var(--t-lg);
     color: var(--accent);
     letter-spacing: -0.01em;
   }
@@ -3285,7 +3373,7 @@
   .edit-reason {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 14.5px;
+    font-size: var(--t-base);
     line-height: 1.55;
     color: var(--ink-2);
     letter-spacing: -0.005em;
@@ -3303,7 +3391,7 @@
   }
   .edit-action {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     background: transparent;
     border: 1px solid var(--line);
@@ -3339,7 +3427,7 @@
   }
   .edits-footer-note {
     font-family: var(--sans);
-    font-size: 12.5px;
+    font-size: var(--t-sm);
     color: var(--ink-3);
     line-height: 1.5;
   }
@@ -3349,7 +3437,7 @@
   }
   .edits-apply {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: var(--t-sm);
     font-weight: 600;
     color: #1a0e02;
     background: var(--accent);
@@ -3444,8 +3532,8 @@
 <!-- ─────── MAIN ─────── -->
 <main class="main">
 
-  <!-- Topbar with breadcrumbs -->
-  <nav class="topbar">
+  <!-- Shell top — breadcrumbs + actions, sits in the top gutter -->
+  <div class="shell-top">
     <div class="breadcrumbs">
       <a href="#" class="crumb">Studio</a>
       <span class="crumb-sep">
@@ -3458,9 +3546,6 @@
       <span class="crumb current">Episode 47</span>
     </div>
     <div class="topbar-right">
-      <div class="topbar-action" title="Search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      </div>
       <div class="topbar-action" title="Notifications">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </div>
@@ -3490,7 +3575,10 @@
         Publish episode
       </button>
     </div>
-  </nav>
+  </div>
+
+  <!-- The workspace card -->
+  <div class="workspace-card">
 
   <div class="container">
 
@@ -3572,6 +3660,21 @@
             The strongest thread runs from minute 23 to 71 — when Sarah stops
             performing and starts telling the truth about why she left.
           </p>
+
+          <div class="edit-proof">
+            <div class="proof-cell">
+              <div class="proof-label">Recorded</div>
+              <div class="proof-value">1h 47m</div>
+            </div>
+            <div class="proof-cell highlight">
+              <div class="proof-label">Final cut</div>
+              <div class="proof-value">1h 36m</div>
+            </div>
+            <div class="proof-cell">
+              <div class="proof-label">Trimmed</div>
+              <div class="proof-value">−11m</div>
+            </div>
+          </div>
 
           <p class="ai-note">
             The most consequential cut: I removed the first four minutes —
@@ -4235,6 +4338,7 @@
     </section>
 
   </div>
+  </div><!-- /.workspace-card -->
 </main>
 
 <!-- ─────── EDITS SIDE PANEL ─────── -->
