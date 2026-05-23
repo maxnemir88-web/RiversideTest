@@ -294,6 +294,12 @@
     flex-direction: column;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
     position: relative;
+    /* Hide scrollbar — card scrolls silently */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge legacy */
+  }
+  .workspace-card::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, newer Edge */
   }
   .breadcrumbs {
     display: flex;
@@ -561,8 +567,8 @@
     gap: 14px;
   }
   .transport-play {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: var(--ink);
     color: var(--bg);
@@ -573,13 +579,17 @@
     cursor: pointer;
     flex-shrink: 0;
     transition: all 0.2s;
+    /* Offset to align with the waveform center, not the whole scrubber-wrap.
+       Scrubber-wrap has 22px top padding (stars) + 10px bottom padding (timeline) —
+       offsetting by (22-10)/2 = 6px down accounts for the asymmetric padding. */
+    margin-top: 6px;
     align-self: center;
   }
   .transport-play:hover {
     background: var(--accent);
     transform: scale(1.04);
   }
-  .transport-play svg { width: 14px; height: 14px; margin-left: 2px; }
+  .transport-play svg { width: 18px; height: 18px; margin-left: 2px; }
 
   .scrubber-wrap {
     position: relative;
@@ -3275,9 +3285,11 @@
     transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
+  }
+  .edits-panel.open {
+    transform: translateX(0);
     box-shadow: -30px 0 80px -30px rgba(0,0,0,0.6);
   }
-  .edits-panel.open { transform: translateX(0); }
 
   .edits-header {
     padding: 28px 28px 20px;
@@ -3684,7 +3696,7 @@
           <div class="player-transport">
             <div class="scrubber-section">
               <button class="transport-play" aria-label="Play">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 5v14l11-7z"/></svg>
               </button>
 
               <div class="scrubber-wrap">
@@ -4965,6 +4977,14 @@
 </aside>
 
 <script>
+  // Helper: scroll the workspace card (the internal scroll container) to top
+  function scrollCardToTop() {
+    const card = document.querySelector('.workspace-card');
+    if (card) card.scrollTo({ top: 0, behavior: 'smooth' });
+    // Also reset the window in case the page itself scrolled
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   // ─── LISTEN-BACK SEQUENCE ───
   (function runListenBack() {
     const overlay = document.getElementById('listenBack');
@@ -5465,7 +5485,7 @@
         document.body.classList.add('mode-scheduled');
         buildPublishedWaveform();
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollCardToTop();
     }, 300);
   }
 
@@ -5648,7 +5668,7 @@
   if (demoReset) {
     demoReset.addEventListener('click', () => {
       document.body.classList.remove('publishing', 'published', 'mode-scheduled');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollCardToTop();
     });
   }
 
@@ -5723,7 +5743,7 @@
       // Restore to Launchpad state
       document.body.classList.remove('published', 'mode-scheduled', 'publishing');
       closeCancelConfirm();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollCardToTop();
     });
   }
   if (cancelConfirmScrim) {
