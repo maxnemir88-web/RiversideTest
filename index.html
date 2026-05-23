@@ -1812,6 +1812,22 @@
     color: var(--ink);
     line-height: 1.1;
   }
+  .modal-chosen-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .modal-chosen-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: var(--t-base);
+    color: var(--ink-2);
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+  }
+
   .modal-subtitle {
     font-family: var(--sans);
     font-size: var(--t-sm);
@@ -3600,7 +3616,7 @@
         </button>
         <div class="menu-popup" id="menuPopup">
           <a href="#" class="menu-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
             <span>Open in editor</span>
           </a>
           <a href="#" class="menu-item">
@@ -4436,6 +4452,9 @@
     <div class="modal-header">
       <div class="modal-title-block">
         <h2 class="modal-title" id="modalTitle">Publish your episode</h2>
+        <div class="modal-chosen-title-row" id="modalChosenTitleRow">
+          <span class="modal-chosen-title" id="modalChosenTitle">"I left Google to make something I could explain to my mom"</span>
+        </div>
         <p class="modal-subtitle" id="modalSubtitle">
           <span>1h 36m episode</span><span class="sep">·</span><span>3 clips</span><span class="sep">·</span><span>3 promo posts</span>
         </p>
@@ -5099,21 +5118,44 @@
     wf.innerHTML = html;
 
     // Place stars above peak regions
+    // Calculate positions from the actual DOM bars (the flexbox gap means the
+    // simple i/barCount math is slightly off — read real positions instead)
     const wfStars = document.getElementById('wfStars');
-    if (wfStars) {
-      const starPositions = [
+    function alignStars() {
+      if (!wfStars) return;
+      const bars = wf.querySelectorAll('.wf-bar');
+      const wfRect = wf.getBoundingClientRect();
+      if (wfRect.width === 0 || !bars.length) return;
+
+      const peakGroups = [
         peakRegions.hook.bars,
         peakRegions.quotable.bars,
         peakRegions.peak.bars,
-      ].map(bars => {
-        const center = bars[Math.floor(bars.length / 2)];
-        return (center / barCount) * 100;
-      });
-      wfStars.innerHTML = starPositions.map(pos => `
+      ];
+      const positions = peakGroups.map(barIndices => {
+        const centerIdx = barIndices[Math.floor(barIndices.length / 2)];
+        const bar = bars[centerIdx];
+        if (!bar) return null;
+        const barRect = bar.getBoundingClientRect();
+        const barCenterX = barRect.left + barRect.width / 2 - wfRect.left;
+        return (barCenterX / wfRect.width) * 100;
+      }).filter(p => p !== null);
+
+      wfStars.innerHTML = positions.map(pos => `
         <div class="wf-star" style="left:${pos}%">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7H22l-6 4.5 2.5 7.5L12 16l-6.5 5L8 13.5 2 9h7.5z"/></svg>
         </div>
       `).join('');
+    }
+    if (wfStars) {
+      // Defer one frame so the bars have rendered and have real widths
+      requestAnimationFrame(alignStars);
+      // Also re-align on window resize
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(alignStars, 100);
+      });
     }
   }
   if (playhead) playhead.style.left = PLAYHEAD_PCT + '%';
@@ -5282,6 +5324,7 @@
 
   function openModal(mode, options) {
     options = options || {};
+    const modalChosenTitleRow = document.getElementById('modalChosenTitleRow');
     if (mode === 'episode') {
       // Full publish flow
       modalTitle.textContent = 'Publish your episode';
@@ -5289,6 +5332,7 @@
       modalConfirmText.textContent = 'Publish episode';
       episodeSection.classList.remove('hidden');
       clipSection.classList.remove('hidden');
+      if (modalChosenTitleRow) modalChosenTitleRow.style.display = '';
     } else if (mode === 'share-all') {
       modalTitle.textContent = 'Share your clips';
       modalSubtitle.innerHTML = '<span>3 clips selected</span><span class="sep">·</span><span>strongest of 6</span>';
@@ -5296,6 +5340,7 @@
       episodeSection.classList.add('hidden');
       clipSection.classList.remove('hidden');
       if (clipSectionLabel) clipSectionLabel.textContent = 'Share to';
+      if (modalChosenTitleRow) modalChosenTitleRow.style.display = 'none';
     } else if (mode === 'share-one') {
       modalTitle.textContent = 'Share this clip';
       modalSubtitle.innerHTML = '<span>' + (options.clipName || 'Clip') + '</span><span class="sep">·</span><span>' + (options.duration || '') + '</span>';
@@ -5303,8 +5348,14 @@
       episodeSection.classList.add('hidden');
       clipSection.classList.remove('hidden');
       if (clipSectionLabel) clipSectionLabel.textContent = 'Share to';
+      if (modalChosenTitleRow) modalChosenTitleRow.style.display = 'none';
     }
     updateDestCount();
+    // Sync the chosen title into the modal preview
+    const modalChosenTitle = document.getElementById('modalChosenTitle');
+    if (modalChosenTitle && typeof chosenTitle !== 'undefined') {
+      modalChosenTitle.textContent = chosenTitle;
+    }
     publishScrim.classList.add('open');
   }
 
@@ -5732,6 +5783,8 @@
       if (newTitle) {
         chosenTitle = newTitle;
         if (plChosenTitle) plChosenTitle.textContent = chosenTitle;
+        const modalChosenTitle = document.getElementById('modalChosenTitle');
+        if (modalChosenTitle) modalChosenTitle.textContent = chosenTitle;
       }
       closeTitleEdit();
     });
